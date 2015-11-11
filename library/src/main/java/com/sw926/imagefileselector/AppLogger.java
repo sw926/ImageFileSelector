@@ -15,7 +15,7 @@ import java.util.Stack;
  */
 public class AppLogger {
 
-    private static boolean DEBUG = true;
+    static boolean DEBUG = false;
     protected static final String TAG = "music_more_fun";
     protected static final String TIMER_TAG = "TraceTime";
 

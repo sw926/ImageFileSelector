@@ -58,6 +58,10 @@ public class ImageFileSelector {
         });
     }
 
+    public static void setDebug(boolean debug) {
+        AppLogger.DEBUG = debug;
+    }
+
     /**
      * 设置压缩后的文件大小
      *

@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
 
+#####支持Android版本：Android 2.2+
+
 选取图片
 ----------
 初始化
