@@ -59,16 +59,6 @@ public class ImageFileSelector {
     }
 
     /**
-     * 设置一个最小的文件大小，小于该大小的文件不进行压缩
-     *
-     * @param minFileSize 最小文件字节数
-     */
-    @SuppressWarnings("unused")
-    public void setMinFileSize(int minFileSize) {
-        mImageCompressHelper.setMinFileSize(minFileSize);
-    }
-
-    /**
      * 设置压缩后的文件大小
      *
      * @param maxWidth  压缩后文件宽度

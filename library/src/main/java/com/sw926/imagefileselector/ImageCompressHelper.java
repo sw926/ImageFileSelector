@@ -13,7 +13,6 @@ class ImageCompressHelper {
 
     private int mMaxWidth = 1000;
     private int mMaxHeight = 1000;
-    private int mMinFileSize = 150 * 1024;
     private int mQuality = 80;
 
     private Context mContext;
@@ -25,16 +24,6 @@ class ImageCompressHelper {
 
     public void setCallback(CompressCallback callback) {
         mCallback = callback;
-    }
-
-    /**
-     * 设置一个最小的文件大小，小于该大小的文件不进行压缩
-     *
-     * @param minFileSize 最小文件字节数
-     */
-    @SuppressWarnings("unused")
-    public void setMinFileSize(int minFileSize) {
-        mMinFileSize = minFileSize;
     }
 
     /**
@@ -79,15 +68,10 @@ class ImageCompressHelper {
             ImageFile srcFileInfo = params[0];
             File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
             File srcFile = new File(srcFileInfo.mSrcFilePath);
-            if (srcFile.length() < mMinFileSize) {
-                // 小于指定尺寸，直接copy
+            boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mQuality);
+            if (!isCompress) {
+                // 没有压缩，直接copy
                 CommonUtils.copy(srcFile, outputFile);
-            } else {
-                boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mQuality);
-                if (!isCompress) {
-                    // 没有压缩，直接copy
-                    CommonUtils.copy(srcFile, outputFile);
-                }
             }
             if (srcFileInfo.mDeleteSrc) {
                 //noinspection ResultOfMethodCallIgnored
@@ -133,7 +117,7 @@ class ImageCompressHelper {
 
         if (actualWidth < maxWidth && actualHeight < maxHeight) {
             AppLogger.w(TAG, "stop compress: input size < output size");
-            return false;
+            return rotateImage(srcFile, dstFile, quality);
         }
 
         int sampleSize;
@@ -188,6 +172,27 @@ class ImageCompressHelper {
         AppLogger.i(TAG, "output file length:" + (int) (new File(dstFile).length() / 1024d) + "kb");
         AppLogger.i(TAG, "------------------ compress file complete ---------------");
         return true;
+    }
+
+    private static boolean rotateImage(String imageFile, String outputFile, int quality) {
+        int degree = ImageUtils.getExifOrientation(imageFile);
+        if (degree != 0) {
+            AppLogger.i(TAG, "rotate image from:" + degree);
+            Bitmap origin = BitmapFactory.decodeFile(imageFile);
+            Bitmap rotate = ImageUtils.rotateImage(degree, origin);
+            if (rotate != null) {
+                ImageUtils.saveBitmap(rotate, outputFile, Bitmap.CompressFormat.JPEG, quality);
+                rotate.recycle();
+                origin.recycle();
+                return true;
+            } else {
+                AppLogger.e(TAG, "rotate image failed:" + imageFile);
+                AppLogger.e(TAG, "use origin image");
+            }
+            origin.recycle();
+        }
+
+        return false;
     }
 
     public interface CompressCallback {
