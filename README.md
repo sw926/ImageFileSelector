@@ -48,8 +48,6 @@ public void onRequestPermissionsResult(int requestCode, String[] permissions, in
 ```
 设置参数
 ```java
-// 设置一个文件大小，小于该大小的文件不进行压缩
-mImageFileSelector.setMinFileSize(100 * 1024)；
 // 设置输出文件的尺寸
 mImageFileSelector.setOutPutImageSize(800, 600);
 // 设置保存图片的质量 0到100
