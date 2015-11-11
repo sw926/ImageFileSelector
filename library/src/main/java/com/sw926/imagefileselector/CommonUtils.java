@@ -22,7 +22,7 @@ public class CommonUtils {
     public static boolean copy(File source, File dest) {
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
-
+        boolean result = true;
         try {
             bis = new BufferedInputStream(new FileInputStream(source));
             bos = new BufferedOutputStream(new FileOutputStream(dest, false));
@@ -34,17 +34,17 @@ public class CommonUtils {
                 bos.write(buf);
             } while (bis.read(buf) != -1);
         } catch (IOException e) {
-            return false;
+            result = false;
         } finally {
             try {
                 if (bis != null) bis.close();
                 if (bos != null) bos.close();
             } catch (IOException e) {
-                return false;
+                result = false;
             }
         }
 
-        return true;
+        return result;
     }
 
     /**
