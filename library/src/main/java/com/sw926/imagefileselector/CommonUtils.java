@@ -52,7 +52,7 @@ public class CommonUtils {
      *
      * @param context context
      * @param ext     文件后缀名 e.g ".jpg"
-     * @return
+     * @return 生成的临时文件
      */
     public static File generateExternalImageCacheFile(Context context, String ext) {
         String fileName = "img_" + System.currentTimeMillis();

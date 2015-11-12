@@ -46,7 +46,7 @@ public class AppLogger {
     /**
      * Send a DEBUG log message.
      *
-     * @param msg
+     * @param msg The message you would like logged.
      */
     public static void d(String msg) {
         if (DEBUG)

@@ -1,6 +1,7 @@
 package com.sw926.imagefileselector;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,7 +9,6 @@ import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import java.io.File;

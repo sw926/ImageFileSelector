@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -55,18 +54,6 @@ class ImageCaptureHelper {
         mOutFile = CommonUtils.generateExternalImageCacheFile(activity, ".jpg");
         try {
             activity.startActivityForResult(createIntent(), CHOOSE_PHOTO_FROM_CAMERA);
-        } catch (ActivityNotFoundException e) {
-            AppLogger.printStackTrace(e);
-            if (mCallback != null) {
-                mCallback.onError();
-            }
-        }
-    }
-
-    public void captureImage(Fragment fragment) {
-        mOutFile = CommonUtils.generateExternalImageCacheFile(fragment.getContext(), ".jpg");
-        try {
-            fragment.startActivityForResult(createIntent(), CHOOSE_PHOTO_FROM_CAMERA);
         } catch (ActivityNotFoundException e) {
             AppLogger.printStackTrace(e);
             if (mCallback != null) {
