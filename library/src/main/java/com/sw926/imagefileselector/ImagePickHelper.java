@@ -36,6 +36,7 @@ class ImagePickHelper {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 //申请WRITE_EXTERNAL_STORAGE权限
+                mActivityWeakReference = new WeakReference<>(activity);
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         READ_EXTERNAL_STORAGE_REQUEST_CODE);
 
