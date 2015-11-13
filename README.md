@@ -5,6 +5,23 @@
 
 #####支持Android版本：Android 2.2+
 
+使用方法
+----------
+Maven
+```xml
+<dependency>
+  <groupId>com.sw926.imagefileselector</groupId>
+  <artifactId>library</artifactId>
+  <version>1.0.1</version>
+  <type>aar</type>
+</dependency>
+```
+Gradle
+```gradle
+compile 'com.sw926.imagefileselector:library:1.0.1'
+```
+
+
 选取图片
 ----------
 初始化
