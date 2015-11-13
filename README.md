@@ -113,7 +113,7 @@ protected void onRestoreInstanceState(Bundle savedInstanceState) {
 mImageCropper.setOutPutAspect(1, 1);
 // 设置输出文件的尺寸
 mImageCropper.setOutPut(800, 800);
-// 设置是否缩放到支持的尺寸
+// 设置是否缩放到指定的尺寸
 mImageCropper.setScale(true);
 ```
 裁切图片
