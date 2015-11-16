@@ -3,6 +3,7 @@ package com.sw926.imagefileselector;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import java.io.File;
@@ -81,6 +82,16 @@ public class ImageFileSelector {
     @SuppressWarnings("unused")
     public void setQuality(int quality) {
         mImageCompressHelper.setQuality(quality);
+    }
+
+    /**
+     * set image compress format
+     *
+     * @param compressFormat compress format
+     */
+    @SuppressWarnings("unused")
+    public void setCompressFormat(Bitmap.CompressFormat compressFormat) {
+        mImageCompressHelper.setCompressFormat(compressFormat);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

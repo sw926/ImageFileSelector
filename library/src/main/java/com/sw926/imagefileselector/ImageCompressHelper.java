@@ -14,6 +14,7 @@ class ImageCompressHelper {
     private int mMaxWidth = 1000;
     private int mMaxHeight = 1000;
     private int mQuality = 80;
+    private Bitmap.CompressFormat mCompressFormat = null;
 
     private Context mContext;
     private CompressCallback mCallback;
@@ -36,6 +37,11 @@ class ImageCompressHelper {
     public void setOutPutImageSize(int maxWidth, int maxHeight) {
         mMaxWidth = maxWidth;
         mMaxHeight = maxHeight;
+    }
+
+    @SuppressWarnings("unused")
+    public void setCompressFormat(Bitmap.CompressFormat compressFormat) {
+        mCompressFormat = compressFormat;
     }
 
     /**
@@ -65,10 +71,18 @@ class ImageCompressHelper {
 
         @Override
         protected String doInBackground(ImageFile... params) {
+            AppLogger.i(TAG, "------------------ start compress file ------------------");
             ImageFile srcFileInfo = params[0];
-            File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
+
+            Bitmap.CompressFormat format = mCompressFormat;
+            if (format == null) {
+                format = CompressFormatUtils.parseFormat(srcFileInfo.mSrcFilePath);
+            }
+            AppLogger.i(TAG, "use compress format:" + format.name());
+
+            File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, CompressFormatUtils.getExt(format));
             File srcFile = new File(srcFileInfo.mSrcFilePath);
-            boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mQuality);
+            boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mQuality, format);
             if (!isCompress) {
                 // 没有压缩，直接copy
                 CommonUtils.copy(srcFile, outputFile);
@@ -99,9 +113,8 @@ class ImageCompressHelper {
      * @param maxHeight 最大高度
      * @return true进行了压缩，false无需压缩
      */
-    public static boolean compressImageFile(String srcFile, String dstFile, int maxWidth, int maxHeight, int quality) {
+    public static boolean compressImageFile(String srcFile, String dstFile, int maxWidth, int maxHeight, int quality, Bitmap.CompressFormat compressFormat) {
 
-        AppLogger.i(TAG, "------------------ start compress file ------------------");
         AppLogger.i(TAG, "compress file:" + srcFile);
         AppLogger.i(TAG, "file length:" + (int) (new File(srcFile).length() / 1024d) + "kb");
         AppLogger.i(TAG, "output size:(" + maxWidth + ", " + maxHeight + ")");
@@ -117,7 +130,7 @@ class ImageCompressHelper {
 
         if (actualWidth < maxWidth && actualHeight < maxHeight) {
             AppLogger.w(TAG, "stop compress: input size < output size");
-            return rotateImage(srcFile, dstFile, quality);
+            return rotateImage(srcFile, dstFile, quality, compressFormat);
         }
 
         int sampleSize;
@@ -137,11 +150,15 @@ class ImageCompressHelper {
 
         decodeOptions.inJustDecodeBounds = false;
         decodeOptions.inSampleSize = sampleSize;
+        decodeOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        decodeOptions.inPurgeable = true;
+        decodeOptions.inInputShareable = true;
         Bitmap bitmap = null;
         try {
             bitmap = BitmapFactory.decodeFile(srcFile, decodeOptions);
         } catch (OutOfMemoryError error) {
-            AppLogger.e(error.getMessage());
+            error.printStackTrace();
+            AppLogger.e(TAG, "OutOfMemoryError:" + srcFile + ", size(" + actualWidth + ", " + actualHeight + ")");
         }
 
         if (bitmap == null) {
@@ -167,21 +184,21 @@ class ImageCompressHelper {
             bitmap = rotate;
         }
 
-        ImageUtils.saveBitmap(bitmap, dstFile, Bitmap.CompressFormat.JPEG, quality);
+        ImageUtils.saveBitmap(bitmap, dstFile, compressFormat, quality);
 
         AppLogger.i(TAG, "output file length:" + (int) (new File(dstFile).length() / 1024d) + "kb");
         AppLogger.i(TAG, "------------------ compress file complete ---------------");
         return true;
     }
 
-    private static boolean rotateImage(String imageFile, String outputFile, int quality) {
+    private static boolean rotateImage(String imageFile, String outputFile, int quality, Bitmap.CompressFormat compressFormat) {
         int degree = ImageUtils.getExifOrientation(imageFile);
         if (degree != 0) {
             AppLogger.i(TAG, "rotate image from:" + degree);
             Bitmap origin = BitmapFactory.decodeFile(imageFile);
             Bitmap rotate = ImageUtils.rotateImage(degree, origin);
             if (rotate != null) {
-                ImageUtils.saveBitmap(rotate, outputFile, Bitmap.CompressFormat.JPEG, quality);
+                ImageUtils.saveBitmap(rotate, outputFile, compressFormat, quality);
                 rotate.recycle();
                 origin.recycle();
                 return true;
