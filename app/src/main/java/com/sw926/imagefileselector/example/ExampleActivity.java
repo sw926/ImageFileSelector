@@ -13,13 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sw926.imagefileselector.AppLogger;
 import com.sw926.imagefileselector.ImageCropper;
 import com.sw926.imagefileselector.ImageFileSelector;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class ExampleActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView mImageView;
     private TextView mTvPath;
@@ -33,12 +32,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private File mCurrentSelectFile;
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main);
 
         ImageFileSelector.setDebug(true);
+
+        findViewById(R.id.btn_from_sdcard).setOnClickListener(this);
+        findViewById(R.id.btn_from_camera).setOnClickListener(this);
+        findViewById(R.id.btn_crop).setOnClickListener(this);
 
         mImageView = (ImageView) findViewById(R.id.iv_image);
         mTvPath = (TextView) findViewById(R.id.tv_path);
@@ -55,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mCurrentSelectFile = new File(file);
                     mBtnCrop.setVisibility(View.VISIBLE);
                 } else {
-                    Toast.makeText(MainActivity.this, "select image file error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExampleActivity.this, "select image file error", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onError() {
-                Toast.makeText(MainActivity.this, "select image file error", Toast.LENGTH_LONG).show();
+                Toast.makeText(ExampleActivity.this, "select image file error", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -74,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (result == ImageCropper.CropperResult.success) {
                     loadImage(outFile.getPath());
                 } else if (result == ImageCropper.CropperResult.error_illegal_input_file) {
-                    Toast.makeText(MainActivity.this, "input file error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExampleActivity.this, "input file error", Toast.LENGTH_LONG).show();
                 } else if (result == ImageCropper.CropperResult.error_illegal_out_file) {
-                    Toast.makeText(MainActivity.this, "output file error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExampleActivity.this, "output file error", Toast.LENGTH_LONG).show();
                 }
             }
         });

@@ -1,7 +1,6 @@
 package com.sw926.imagefileselector;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +8,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -103,7 +103,7 @@ public class ImageCropper {
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState.containsKey(IMAGE_CROPPER_BOUDLE)) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(IMAGE_CROPPER_BOUDLE)) {
             Bundle bundle = savedInstanceState.getBundle(IMAGE_CROPPER_BOUDLE);
             if (bundle != null) {
                 mOutPutX = bundle.getInt("outgetX");

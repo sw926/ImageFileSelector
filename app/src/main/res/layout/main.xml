@@ -12,7 +12,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context=".MainActivity">
+        tools:context=".ExampleActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -52,14 +52,12 @@
             android:id="@+id/btn_from_sdcard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
             android:text="From SDCard" />
 
         <Button
             android:id="@+id/btn_from_camera"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
             android:text="From Camera" />
 
 
@@ -67,7 +65,6 @@
             android:id="@+id/btn_crop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onClick"
             android:text="Crop Image" />
 
         <TextView

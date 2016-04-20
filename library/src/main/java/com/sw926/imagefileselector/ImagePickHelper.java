@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
@@ -22,6 +23,7 @@ class ImagePickHelper {
     private Context mContext;
 
     private WeakReference<Activity> mActivityWeakReference;
+    private WeakReference<Fragment> mFragmentWeakReference;
 
     public ImagePickHelper(Context context) {
         mContext = context;
@@ -29,6 +31,22 @@ class ImagePickHelper {
 
     public void setCallback(Callback callback) {
         mCallback = callback;
+    }
+
+    public void selectImage(Fragment fragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                mFragmentWeakReference = new WeakReference<>(fragment);
+                fragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        READ_EXTERNAL_STORAGE_REQUEST_CODE);
+
+            } else {
+                doSelect(fragment);
+            }
+        } else {
+            doSelect(fragment);
+        }
     }
 
     public void selectorImage(Activity activity) {
@@ -51,6 +69,12 @@ class ImagePickHelper {
     private void doSelect(Activity activity) {
         Intent intent = createIntent();
         activity.startActivityForResult(intent, SELECT_PIC);
+    }
+
+
+    private void doSelect(Fragment fragment) {
+        Intent intent = createIntent();
+        fragment.startActivityForResult(intent, SELECT_PIC);
     }
 
     private Intent createIntent() {
@@ -76,9 +100,18 @@ class ImagePickHelper {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == READ_EXTERNAL_STORAGE_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Activity activity = mActivityWeakReference.get();
-                if (activity != null) {
-                    doSelect(activity);
+                if (mFragmentWeakReference != null) {
+                    Fragment fragment = mFragmentWeakReference.get();
+                    if (fragment != null) {
+                        doSelect(fragment);
+                    }
+                } else if (mActivityWeakReference != null) {
+                    Activity activity = mActivityWeakReference.get();
+                    if (activity != null) {
+                        doSelect(activity);
+                    }
+                } else if (mCallback != null) {
+                    mCallback.onError();
                 }
             } else {
                 if (mCallback != null) {
