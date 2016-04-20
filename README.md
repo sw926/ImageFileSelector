@@ -2,6 +2,7 @@
 ##### 轻量级的选取图片和裁切图片的库，使用系统自带的软件实现。
 
 [![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
+[![Get it on Google Play](http://www.android.com/images/brand/get_it_on_play_logo_small.png)](http://play.google.com/store/apps/details?id=com.sw926.imagefileselector.example)
 
 #####支持Android版本：Android 2.2+
 
