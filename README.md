@@ -11,15 +11,14 @@
 Maven
 ```xml
 <dependency>
-  <groupId>com.sw926.imagefileselector</groupId>
-  <artifactId>library</artifactId>
-  <version>1.0.1</version>
-  <type>aar</type>
+    <groupId>com.sw926.imagefileselector</groupId>
+    <artifactId>library</artifactId>
+    <version>1.0.3-snapshot</version>
 </dependency>
 ```
 Gradle
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.1'
+compile 'com.sw926.imagefileselector:library:1.0.3-snapshot'
 ```
 
 
@@ -105,7 +104,7 @@ mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
     }
 });
 ```
-在Activit中加入以下代码
+在Activit或Fragment中加入以下代码
 ```java
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
