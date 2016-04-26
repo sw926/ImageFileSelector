@@ -1,12 +1,13 @@
 package com.sw926.imagefileselector;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -65,8 +66,21 @@ class ImageCaptureHelper {
         }
     }
 
-    public void captureImage(Fragment fragment) {
+    public void captureImage(android.support.v4.app.Fragment fragment) {
         mOutFile = CommonUtils.generateExternalImageCacheFile(fragment.getContext(), ".jpg");
+        try {
+            fragment.startActivityForResult(createIntent(), CHOOSE_PHOTO_FROM_CAMERA);
+        } catch (ActivityNotFoundException e) {
+            AppLogger.printStackTrace(e);
+            if (mCallback != null) {
+                mCallback.onError();
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public void captureImage(android.app.Fragment fragment) {
+        mOutFile = CommonUtils.generateExternalImageCacheFile(fragment.getActivity(), ".jpg");
         try {
             fragment.startActivityForResult(createIntent(), CHOOSE_PHOTO_FROM_CAMERA);
         } catch (ActivityNotFoundException e) {

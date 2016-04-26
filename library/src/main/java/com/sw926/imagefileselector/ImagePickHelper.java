@@ -1,6 +1,7 @@
 package com.sw926.imagefileselector;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
@@ -22,8 +22,7 @@ class ImagePickHelper {
     private Callback mCallback;
     private Context mContext;
 
-    private WeakReference<Activity> mActivityWeakReference;
-    private WeakReference<Fragment> mFragmentWeakReference;
+    private WeakReference mWeakReference;
 
     public ImagePickHelper(Context context) {
         mContext = context;
@@ -33,11 +32,27 @@ class ImagePickHelper {
         mCallback = callback;
     }
 
-    public void selectImage(Fragment fragment) {
+    public void selectImage(android.app.Fragment fragment) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                mFragmentWeakReference = new WeakReference<>(fragment);
+                mWeakReference = new WeakReference<>(fragment);
+                fragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        READ_EXTERNAL_STORAGE_REQUEST_CODE);
+
+            } else {
+                doSelect(fragment);
+            }
+        } else {
+            doSelect(fragment);
+        }
+    }
+
+    public void selectImage(android.support.v4.app.Fragment fragment) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                mWeakReference = new WeakReference<>(fragment);
                 fragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         READ_EXTERNAL_STORAGE_REQUEST_CODE);
 
@@ -54,7 +69,7 @@ class ImagePickHelper {
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 //申请WRITE_EXTERNAL_STORAGE权限
-                mActivityWeakReference = new WeakReference<>(activity);
+                mWeakReference = new WeakReference<>(activity);
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         READ_EXTERNAL_STORAGE_REQUEST_CODE);
 
@@ -71,8 +86,13 @@ class ImagePickHelper {
         activity.startActivityForResult(intent, SELECT_PIC);
     }
 
+    private void doSelect(android.support.v4.app.Fragment fragment) {
+        Intent intent = createIntent();
+        fragment.startActivityForResult(intent, SELECT_PIC);
+    }
 
-    private void doSelect(Fragment fragment) {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void doSelect(android.app.Fragment fragment) {
         Intent intent = createIntent();
         fragment.startActivityForResult(intent, SELECT_PIC);
     }
@@ -100,24 +120,23 @@ class ImagePickHelper {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == READ_EXTERNAL_STORAGE_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (mFragmentWeakReference != null) {
-                    Fragment fragment = mFragmentWeakReference.get();
-                    if (fragment != null) {
-                        doSelect(fragment);
+                if (mWeakReference != null) {
+                    Object holder = mWeakReference.get();
+                    if (holder != null) {
+                        if (holder instanceof android.app.Fragment) {
+                            doSelect((android.app.Fragment) holder);
+                            return;
+                        } else if (holder instanceof android.support.v4.app.Fragment) {
+                            doSelect((android.support.v4.app.Fragment) holder);
+                            return;
+                        } else if (holder instanceof Activity) {
+                            doSelect((Activity) holder);
+                            return;
+                        }
                     }
-                } else if (mActivityWeakReference != null) {
-                    Activity activity = mActivityWeakReference.get();
-                    if (activity != null) {
-                        doSelect(activity);
-                    }
-                } else if (mCallback != null) {
-                    mCallback.onError();
-                }
-            } else {
-                if (mCallback != null) {
-                    mCallback.onError();
                 }
             }
+            mCallback.onError();
         }
     }
 
