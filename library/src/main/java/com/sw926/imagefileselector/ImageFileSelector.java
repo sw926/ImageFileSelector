@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
 import java.io.File;
 
@@ -120,7 +119,11 @@ public class ImageFileSelector {
         mImagePickHelper.selectorImage(activity);
     }
 
-    public void selectImage(Fragment fragment) {
+    public void selectImage(android.support.v4.app.Fragment fragment) {
+        mImagePickHelper.selectImage(fragment);
+    }
+
+    public void selectImage(android.app.Fragment  fragment) {
         mImagePickHelper.selectImage(fragment);
     }
 
@@ -128,7 +131,11 @@ public class ImageFileSelector {
         mImageTaker.captureImage(activity);
     }
 
-    public void takePhoto(Fragment fragment) {
+    public void takePhoto(android.support.v4.app.Fragment fragment) {
+        mImageTaker.captureImage(fragment);
+    }
+
+    public void takePhoto(android.app.Fragment fragment) {
         mImageTaker.captureImage(fragment);
     }
 

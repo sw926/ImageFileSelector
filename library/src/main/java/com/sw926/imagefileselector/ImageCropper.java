@@ -1,14 +1,15 @@
 package com.sw926.imagefileselector;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -36,8 +37,7 @@ public class ImageCropper {
         error_illegal_out_file
     }
 
-    private Fragment mFragment = null;
-    private Activity mActivity = null;
+    private Object mHolder = null;
 
     private int mOutPutX = -1;
     private int mOutPutY = -1;
@@ -55,12 +55,16 @@ public class ImageCropper {
 
     private ImageCropperCallback mCallback;
 
-    public ImageCropper(Fragment fragment) {
-        mFragment = fragment;
+    public ImageCropper(android.support.v4.app.Fragment fragment) {
+        mHolder = fragment;
+    }
+
+    public ImageCropper(android.app.Fragment fragment) {
+        mHolder = fragment;
     }
 
     public ImageCropper(Activity activity) {
-        mActivity = activity;
+        mHolder = activity;
     }
 
     public void setOutPut(int width, int height) {
@@ -81,12 +85,18 @@ public class ImageCropper {
         mCallback = callback;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private Context getContext() {
-        if (mActivity != null) {
-            return mActivity;
-        } else {
-            return mFragment.getActivity();
+        if (mHolder != null) {
+            if (mHolder instanceof Activity) {
+                return (Context) mHolder;
+            } else if (mHolder instanceof android.support.v4.app.Fragment) {
+                return ((android.support.v4.app.Fragment) mHolder).getActivity();
+            } else if (mHolder instanceof android.app.Fragment) {
+                return ((android.app.Fragment) mHolder).getActivity();
+            }
         }
+        return null;
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -159,6 +169,7 @@ public class ImageCropper {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void cropImage(File srcFile) {
 
@@ -217,10 +228,16 @@ public class ImageCropper {
         if (Compatibility.shouldReturnCropData()) {
             intent.putExtra("return-data", true);
         }
-        if (mActivity != null) {
-            mActivity.startActivityForResult(intent, CROP_PHOTO_SMALL);
-        } else {
-            mFragment.startActivityForResult(intent, CROP_PHOTO_SMALL);
+
+        if (mHolder == null) {
+            throw new NullPointerException("'mHolder' is null.");
+        }
+        if (mHolder instanceof Activity) {
+            ((Activity) mHolder).startActivityForResult(intent, CROP_PHOTO_SMALL);
+        } else if (mHolder instanceof android.support.v4.app.Fragment) {
+            ((android.support.v4.app.Fragment) mHolder).startActivityForResult(intent, CROP_PHOTO_SMALL);
+        } else if (mHolder instanceof android.app.Fragment) {
+            ((android.app.Fragment) mHolder).startActivityForResult(intent, CROP_PHOTO_SMALL);
         }
     }
 
