@@ -8,8 +8,8 @@ android {
         applicationId "com.sw926.imagefileselector.example"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "1.0.3"
     }
     buildTypes {
         release {
