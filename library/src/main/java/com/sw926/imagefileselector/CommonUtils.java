@@ -15,7 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-class CommonUtils {
+public class CommonUtils {
 
     public static void startActivityForResult(Object object, Intent intent, int requestCode) {
         if (object != null) {

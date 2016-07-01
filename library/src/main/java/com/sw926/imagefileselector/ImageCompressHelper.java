@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import java.io.File;
 
@@ -14,6 +15,7 @@ public class ImageCompressHelper {
     private int mMaxWidth = 1000;
     private int mMaxHeight = 1000;
     private int mQuality = 80;
+    private long mMaxOutputFileLength = Integer.MAX_VALUE;
     private Bitmap.CompressFormat mCompressFormat = null;
 
     private Context mContext;
@@ -60,10 +62,14 @@ public class ImageCompressHelper {
         mQuality = quality;
     }
 
+    public void setMaxOutputFileLength(long maxOutputFileLength) {
+        mMaxOutputFileLength = maxOutputFileLength;
+    }
+
     public void compress(String fileName, boolean deleteSrc) {
         if (mMaxHeight <= 0 || mMaxWidth <= 0) {
             if (mCallback != null) {
-                File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
+                File outputFile = genOutFile();
                 CommonUtils.copy(new File(fileName), outputFile);
                 mCallback.onCallBack(outputFile.getAbsolutePath());
             }
@@ -86,9 +92,9 @@ public class ImageCompressHelper {
             }
             AppLogger.i(TAG, "use compress format:" + format.name());
 
-            File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, CompressFormatUtils.getExt(format));
+            File outputFile = genOutFile();
             File srcFile = new File(srcFileInfo.mSrcFilePath);
-            boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mQuality, format);
+            boolean isCompress = compressImageFile(srcFileInfo.mSrcFilePath, outputFile.getPath(), mMaxWidth, mMaxHeight, mMaxOutputFileLength, mQuality, format);
             if (!isCompress) {
                 // 没有压缩，直接copy
                 CommonUtils.copy(srcFile, outputFile);
@@ -115,15 +121,19 @@ public class ImageCompressHelper {
      *
      * @param srcFile   源文件
      * @param dstFile   目标文件
-     * @param maxWidth  最大宽度
-     * @param maxHeight 最大高度
+     * @param maxW  最大宽度
+     * @param maxH 最大高度
+     * @param maxLength 输出的最大文件大小
      * @return true进行了压缩，false无需压缩
      */
-    public static boolean compressImageFile(String srcFile, String dstFile, int maxWidth, int maxHeight, int quality, Bitmap.CompressFormat compressFormat) {
+    public static boolean compressImageFile(String srcFile, String dstFile, int maxW, int maxH, long maxLength, int quality, Bitmap.CompressFormat compressFormat) {
+
+        int maxWidth = maxW;
+        int maxHeight = maxH;
 
         long inputFileLength = new File(srcFile).length();
         AppLogger.i(TAG, "compress file:" + srcFile);
-        AppLogger.i(TAG, "file length:" + (int) ( inputFileLength/ 1024d) + "kb");
+        AppLogger.i(TAG, "file length:" + (int) (inputFileLength / 1024d) + "kb");
         AppLogger.i(TAG, "output size:(" + maxWidth + ", " + maxHeight + ")");
 
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
@@ -135,9 +145,19 @@ public class ImageCompressHelper {
 
         AppLogger.i(TAG, "input size:(" + actualWidth + ", " + actualHeight + ")");
 
-        if (actualWidth < maxWidth && actualHeight < maxHeight && inputFileLength > (1000 * 2014L)) {
+        if (actualWidth < maxWidth && actualHeight < maxHeight && inputFileLength < maxLength) {
             AppLogger.w(TAG, "stop compress: input size < output size");
             return rotateImage(srcFile, dstFile, quality, compressFormat);
+        }
+
+        if (actualWidth < maxWidth && actualHeight < maxH && inputFileLength > maxLength) {
+            if (srcFile.endsWith("gif")) {
+                maxWidth = actualWidth;
+                maxHeight = actualHeight;
+            } else {
+                maxWidth = (int) (actualWidth * (maxLength / (float) inputFileLength));
+                maxHeight = (int) (actualHeight * (maxLength / (float) inputFileLength));
+            }
         }
 
         int sampleSize;
@@ -217,6 +237,14 @@ public class ImageCompressHelper {
         }
 
         return false;
+    }
+
+    public File genOutFile() {
+        if (!TextUtils.isEmpty( mOutputPath)) {
+            String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+            return new File(mOutputPath, fileName);
+        }
+        return CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
     }
 
     public interface CompressCallback {

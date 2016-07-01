@@ -6,7 +6,7 @@ import android.os.Build;
 /**
  * Created by sunwei on 15/11/16.
  */
-class CompressFormatUtils {
+public class CompressFormatUtils {
 
     public static Bitmap.CompressFormat parseFormat(String fileName) {
 

@@ -64,6 +64,11 @@ public class ImageFileSelector {
 
     public void setOutPutPath(String outPutPath) {
         mOutPutPath = outPutPath;
+        mImageCompressHelper.setOutputPath(outPutPath);
+    }
+
+    public void setMaxOutputFileLength(long length) {
+        mImageCompressHelper.setMaxOutputFileLength(length);
     }
 
     public static void setDebug(boolean debug) {

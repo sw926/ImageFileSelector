@@ -66,7 +66,7 @@ class ImagePickHelper {
             intent = new Intent(Intent.ACTION_GET_CONTENT);
         }
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/jpeg");
+        intent.setType("image/*");
         return intent;
     }
 
