@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 
 import java.io.File;
 
-class ImageCompressHelper {
+public class ImageCompressHelper {
 
     private static final String TAG = ImageCompressHelper.class.getSimpleName();
 
@@ -19,12 +19,18 @@ class ImageCompressHelper {
     private Context mContext;
     private CompressCallback mCallback;
 
+    private String mOutputPath;
+
     public ImageCompressHelper(Context context) {
         mContext = context;
     }
 
     public void setCallback(CompressCallback callback) {
         mCallback = callback;
+    }
+
+    public void setOutputPath(String outputPath) {
+        mOutputPath = outputPath;
     }
 
     /**
@@ -115,8 +121,9 @@ class ImageCompressHelper {
      */
     public static boolean compressImageFile(String srcFile, String dstFile, int maxWidth, int maxHeight, int quality, Bitmap.CompressFormat compressFormat) {
 
+        long inputFileLength = new File(srcFile).length();
         AppLogger.i(TAG, "compress file:" + srcFile);
-        AppLogger.i(TAG, "file length:" + (int) (new File(srcFile).length() / 1024d) + "kb");
+        AppLogger.i(TAG, "file length:" + (int) ( inputFileLength/ 1024d) + "kb");
         AppLogger.i(TAG, "output size:(" + maxWidth + ", " + maxHeight + ")");
 
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
@@ -128,7 +135,7 @@ class ImageCompressHelper {
 
         AppLogger.i(TAG, "input size:(" + actualWidth + ", " + actualHeight + ")");
 
-        if (actualWidth < maxWidth && actualHeight < maxHeight) {
+        if (actualWidth < maxWidth && actualHeight < maxHeight && inputFileLength > (1000 * 2014L)) {
             AppLogger.w(TAG, "stop compress: input size < output size");
             return rotateImage(srcFile, dstFile, quality, compressFormat);
         }

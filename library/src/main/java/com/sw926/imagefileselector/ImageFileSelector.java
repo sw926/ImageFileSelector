@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 
 import java.io.File;
 
@@ -17,6 +18,8 @@ public class ImageFileSelector {
     private ImagePickHelper mImagePickHelper;
     private ImageCaptureHelper mImageTaker;
     private ImageCompressHelper mImageCompressHelper;
+
+    private String mOutPutPath;
 
     public ImageFileSelector(final Context context) {
         mImagePickHelper = new ImagePickHelper(context);
@@ -57,6 +60,10 @@ public class ImageFileSelector {
                 }
             }
         });
+    }
+
+    public void setOutPutPath(String outPutPath) {
+        mOutPutPath = outPutPath;
     }
 
     public static void setDebug(boolean debug) {
@@ -100,7 +107,11 @@ public class ImageFileSelector {
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == ImagePickHelper.IMAGE_PICK_HELPER_REQUEST_PERMISSIONS) {
+            mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else if (requestCode == ImageCaptureHelper.IMAGE_CAPTURE_REQUEST_PERMISSION) {
+            mImageTaker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -128,7 +139,8 @@ public class ImageFileSelector {
     }
 
     public void takePhoto(Activity activity) {
-        mImageTaker.captureImage(activity);
+//        mImageTaker.captureImage(activity);
+        mImageTaker.captureImage(activity, Environment.getExternalStorageDirectory() + "/muper/");
     }
 
     public void takePhoto(android.support.v4.app.Fragment fragment) {
@@ -157,6 +169,7 @@ public class ImageFileSelector {
     }
 
     public interface Callback {
+
         void onSuccess(String file);
 
         void onError();

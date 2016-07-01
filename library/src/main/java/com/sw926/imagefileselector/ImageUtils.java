@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ImageUtils {
+class ImageUtils {
 
     public static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
         FileOutputStream fo;

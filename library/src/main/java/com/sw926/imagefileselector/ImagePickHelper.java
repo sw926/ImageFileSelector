@@ -8,20 +8,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 
 class ImagePickHelper {
 
     private static final int SELECT_PIC = 0x701;
-    private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 0x11;
+    public static final int IMAGE_PICK_HELPER_REQUEST_PERMISSIONS = 0x11;
 
     private Callback mCallback;
     private Context mContext;
-
     private WeakReference mWeakReference;
 
     public ImagePickHelper(Context context) {
@@ -32,73 +31,40 @@ class ImagePickHelper {
         mCallback = callback;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void selectImage(android.app.Fragment fragment) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                mWeakReference = new WeakReference<>(fragment);
-                fragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        READ_EXTERNAL_STORAGE_REQUEST_CODE);
-
-            } else {
-                doSelect(fragment);
-            }
-        } else {
+        mWeakReference = new WeakReference(fragment);
+        if (PermissionsHelper.checkAndRequestPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(fragment);
         }
     }
 
     public void selectImage(android.support.v4.app.Fragment fragment) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                mWeakReference = new WeakReference<>(fragment);
-                fragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        READ_EXTERNAL_STORAGE_REQUEST_CODE);
-
-            } else {
-                doSelect(fragment);
-            }
-        } else {
+        mWeakReference = new WeakReference(fragment);
+        if (PermissionsHelper.checkAndRequestPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(fragment);
         }
     }
 
     public void selectorImage(Activity activity) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                //申请WRITE_EXTERNAL_STORAGE权限
-                mWeakReference = new WeakReference<>(activity);
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        READ_EXTERNAL_STORAGE_REQUEST_CODE);
-
-            } else {
-                doSelect(activity);
-            }
-        } else {
+        mWeakReference = new WeakReference(activity);
+        if (PermissionsHelper.checkAndRequestPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(activity);
         }
     }
 
-    private void doSelect(Activity activity) {
+    private void doSelect(Object object) {
         Intent intent = createIntent();
-        activity.startActivityForResult(intent, SELECT_PIC);
-    }
-
-    private void doSelect(android.support.v4.app.Fragment fragment) {
-        Intent intent = createIntent();
-        fragment.startActivityForResult(intent, SELECT_PIC);
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void doSelect(android.app.Fragment fragment) {
-        Intent intent = createIntent();
-        fragment.startActivityForResult(intent, SELECT_PIC);
+        CommonUtils.startActivityForResult(object, intent, SELECT_PIC);
     }
 
     private Intent createIntent() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);//ACTION_OPEN_DOCUMENT
+        Intent intent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        } else {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+        }
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/jpeg");
         return intent;
@@ -112,27 +78,23 @@ class ImagePickHelper {
             Uri uri = intent.getData();
             String path = Compatibility.getPath(mContext, uri);
             if (mCallback != null) {
-                mCallback.onSuccess(path);
+                if (!TextUtils.isEmpty(path) && new File(path).exists()) {
+                    mCallback.onSuccess(path);
+                } else {
+                    mCallback.onError();
+                }
             }
         }
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == READ_EXTERNAL_STORAGE_REQUEST_CODE) {
+        if (requestCode == IMAGE_PICK_HELPER_REQUEST_PERMISSIONS) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (mWeakReference != null) {
                     Object holder = mWeakReference.get();
                     if (holder != null) {
-                        if (holder instanceof android.app.Fragment) {
-                            doSelect((android.app.Fragment) holder);
-                            return;
-                        } else if (holder instanceof android.support.v4.app.Fragment) {
-                            doSelect((android.support.v4.app.Fragment) holder);
-                            return;
-                        } else if (holder instanceof Activity) {
-                            doSelect((Activity) holder);
-                            return;
-                        }
+                        doSelect(holder);
+                        return;
                     }
                 }
             }

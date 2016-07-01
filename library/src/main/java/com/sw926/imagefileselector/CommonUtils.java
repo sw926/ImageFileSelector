@@ -1,7 +1,12 @@
 package com.sw926.imagefileselector;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -10,7 +15,32 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class CommonUtils {
+class CommonUtils {
+
+    public static void startActivityForResult(Object object, Intent intent, int requestCode) {
+        if (object != null) {
+            if (object instanceof Activity) {
+                startActivityForResult((Activity) object, intent, requestCode);
+            } else if (object instanceof Fragment) {
+                startActivityForResult((Fragment) object, intent, requestCode);
+            } else if (object instanceof android.app.Fragment) {
+                startActivityForResult((android.app.Fragment) object, intent, requestCode);
+            }
+        }
+    }
+
+    public static void startActivityForResult(Activity activity, Intent intent, int requestCode) {
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static void startActivityForResult(Fragment fragment, Intent intent, int requestCode) {
+        fragment.startActivityForResult(intent, requestCode);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void startActivityForResult(android.app.Fragment fragment, Intent intent, int requestCode) {
+        fragment.startActivityForResult(intent, requestCode);
+    }
 
     /**
      * copy file

@@ -1,10 +1,5 @@
 package com.sw926.imagefileselector;
 
-/**
- * User: Jiang Qi
- * Date: 12-7-31
- */
-
 import android.util.Log;
 
 import java.util.Stack;
@@ -13,7 +8,7 @@ import java.util.Stack;
 /**
  * Wrapper API for sending log output.
  */
-public class AppLogger {
+class AppLogger {
 
     static boolean DEBUG = false;
     protected static final String TAG = "music_more_fun";
