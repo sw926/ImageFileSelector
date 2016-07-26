@@ -19,7 +19,7 @@ public class ImageCropper {
 
     private static final String TAG = ImageCropper.class.getSimpleName();
 
-    private static final String IMAGE_CROPPER_BOUDLE = "image_cropper_boudle";
+    private static final String IMAGE_CROPPER_BUNDLE = "IMAGE_CROPPER_BUNDLE";
     private static final int CROP_PHOTO_SMALL = 2903;
 
     public enum CropperResult {
@@ -109,12 +109,12 @@ public class ImageCropper {
         bundle.putSerializable("outFile", mOutFile);
         bundle.putSerializable("srcFile", mSrcFile);
         bundle.putSerializable("tempFile", mTempFile);
-        outState.putBundle(IMAGE_CROPPER_BOUDLE, bundle);
+        outState.putBundle(IMAGE_CROPPER_BUNDLE, bundle);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey(IMAGE_CROPPER_BOUDLE)) {
-            Bundle bundle = savedInstanceState.getBundle(IMAGE_CROPPER_BOUDLE);
+        if (savedInstanceState != null && savedInstanceState.containsKey(IMAGE_CROPPER_BUNDLE)) {
+            Bundle bundle = savedInstanceState.getBundle(IMAGE_CROPPER_BUNDLE);
             if (bundle != null) {
                 mOutPutX = bundle.getInt("outgetX");
                 mOutPutY = bundle.getInt("outgetY");
