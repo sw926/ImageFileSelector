@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 
 import java.io.File;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 @SuppressWarnings("unused")
 public class ImageFileSelector {
@@ -26,7 +28,7 @@ public class ImageFileSelector {
         mImagePickHelper.setCallback(new ImagePickHelper.Callback() {
             @Override
             public void onSuccess(String file) {
-                AppLogger.d(TAG, "select image from sdcard: " + file);
+                AppLogger.INSTANCE.d(TAG, "select image from sdcard: " + file);
                 handleResult(file, false);
             }
 
@@ -37,16 +39,13 @@ public class ImageFileSelector {
         });
 
         mImageTaker = new ImageCaptureHelper();
-        mImageTaker.setCallback(new ImageCaptureHelper.Callback() {
-            @Override
-            public void onSuccess(String file) {
-                AppLogger.d(TAG, "select image from camera: " + file);
-                handleResult(file, true);
-            }
 
+        mImageTaker.setCallback(new Function1<String, Unit>() {
             @Override
-            public void onError() {
-                handleError();
+            public Unit invoke(String s) {
+                AppLogger.INSTANCE.d(TAG, "select image from camera: " + s);
+                handleResult(s, true);
+                return null;
             }
         });
 
@@ -54,7 +53,7 @@ public class ImageFileSelector {
         mImageCompressHelper.setCallback(new ImageCompressHelper.CompressCallback() {
             @Override
             public void onCallBack(String outFile) {
-                AppLogger.d(TAG, "compress image output: " + outFile);
+                AppLogger.INSTANCE.d(TAG, "compress image output: " + outFile);
                 if (mCallback != null) {
                     mCallback.onSuccess(outFile);
                 }
@@ -72,7 +71,7 @@ public class ImageFileSelector {
     }
 
     public static void setDebug(boolean debug) {
-        AppLogger.DEBUG = debug;
+        AppLogger.INSTANCE.setDEBUG(debug);
     }
 
     /**
@@ -114,17 +113,15 @@ public class ImageFileSelector {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == ImagePickHelper.IMAGE_PICK_HELPER_REQUEST_PERMISSIONS) {
             mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        } else if (requestCode == ImageCaptureHelper.IMAGE_CAPTURE_REQUEST_PERMISSION) {
+        } else if (requestCode == mImageTaker.getMRequestCode()) {
             mImageTaker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        mImageTaker.onSaveInstanceState(outState);
     }
 
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-        mImageTaker.onRestoreInstanceState(savedInstanceState);
     }
 
     public void setCallback(Callback callback) {
@@ -139,21 +136,16 @@ public class ImageFileSelector {
         mImagePickHelper.selectImage(fragment);
     }
 
-    public void selectImage(android.app.Fragment  fragment) {
+    public void selectImage(android.app.Fragment fragment) {
         mImagePickHelper.selectImage(fragment);
     }
 
-    public void takePhoto(Activity activity) {
-//        mImageTaker.captureImage(activity);
-        mImageTaker.captureImage(activity, Environment.getExternalStorageDirectory() + "/muper/");
+    public void takePhoto(Activity activity, int requestCode) {
+        mImageTaker.captureImage(activity, requestCode);
     }
 
-    public void takePhoto(android.support.v4.app.Fragment fragment) {
-        mImageTaker.captureImage(fragment);
-    }
-
-    public void takePhoto(android.app.Fragment fragment) {
-        mImageTaker.captureImage(fragment);
+    public void takePhoto(android.support.v4.app.Fragment fragment, int requestCode) {
+        mImageTaker.captureImage(fragment, requestCode);
     }
 
     private void handleResult(String fileName, boolean deleteSrc) {

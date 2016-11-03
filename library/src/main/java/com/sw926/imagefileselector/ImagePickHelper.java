@@ -1,6 +1,5 @@
 package com.sw926.imagefileselector;
 
-import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -34,21 +33,21 @@ class ImagePickHelper {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void selectImage(android.app.Fragment fragment) {
         mWeakReference = new WeakReference(fragment);
-        if (PermissionsHelper.checkAndRequestPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
+        if (PermissionsHelper.INSTANCE.checkAndRequestPermission(fragment.getActivity(), IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(fragment);
         }
     }
 
     public void selectImage(android.support.v4.app.Fragment fragment) {
         mWeakReference = new WeakReference(fragment);
-        if (PermissionsHelper.checkAndRequestPermission(fragment.getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
+        if (PermissionsHelper.INSTANCE.checkAndRequestPermission(fragment.getActivity(), IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(fragment);
         }
     }
 
     public void selectorImage(Activity activity) {
         mWeakReference = new WeakReference(activity);
-        if (PermissionsHelper.checkAndRequestPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
+        if (PermissionsHelper.INSTANCE.checkAndRequestPermission(activity, IMAGE_PICK_HELPER_REQUEST_PERMISSIONS)) {
             doSelect(activity);
         }
     }

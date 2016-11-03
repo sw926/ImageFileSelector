@@ -83,14 +83,14 @@ public class ImageCompressHelper {
 
         @Override
         protected String doInBackground(ImageFile... params) {
-            AppLogger.i(TAG, "------------------ start compress file ------------------");
+            AppLogger.INSTANCE.i(TAG, "------------------ start compress file ------------------");
             ImageFile srcFileInfo = params[0];
 
             Bitmap.CompressFormat format = mCompressFormat;
             if (format == null) {
-                format = CompressFormatUtils.parseFormat(srcFileInfo.mSrcFilePath);
+                format = CompressFormatUtils.INSTANCE.parseFormat(srcFileInfo.mSrcFilePath);
             }
-            AppLogger.i(TAG, "use compress format:" + format.name());
+            AppLogger.INSTANCE.i(TAG, "use compress format:" + format.name());
 
             File outputFile = genOutFile();
             File srcFile = new File(srcFileInfo.mSrcFilePath);
@@ -132,9 +132,9 @@ public class ImageCompressHelper {
         int maxHeight = maxH;
 
         long inputFileLength = new File(srcFile).length();
-        AppLogger.i(TAG, "compress file:" + srcFile);
-        AppLogger.i(TAG, "file length:" + (int) (inputFileLength / 1024d) + "kb");
-        AppLogger.i(TAG, "output size:(" + maxWidth + ", " + maxHeight + ")");
+        AppLogger.INSTANCE.i(TAG, "compress file:" + srcFile);
+        AppLogger.INSTANCE.i(TAG, "file length:" + (int) (inputFileLength / 1024d) + "kb");
+        AppLogger.INSTANCE.i(TAG, "output size:(" + maxWidth + ", " + maxHeight + ")");
 
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
         decodeOptions.inJustDecodeBounds = true;
@@ -143,10 +143,10 @@ public class ImageCompressHelper {
         int actualWidth = decodeOptions.outWidth;
         int actualHeight = decodeOptions.outHeight;
 
-        AppLogger.i(TAG, "input size:(" + actualWidth + ", " + actualHeight + ")");
+        AppLogger.INSTANCE.i(TAG, "input size:(" + actualWidth + ", " + actualHeight + ")");
 
         if (actualWidth < maxWidth && actualHeight < maxHeight && inputFileLength < maxLength) {
-            AppLogger.w(TAG, "stop compress: input size < output size");
+            AppLogger.INSTANCE.w(TAG, "stop compress: input size < output size");
             return rotateImage(srcFile, dstFile, quality, compressFormat);
         }
 
@@ -173,7 +173,7 @@ public class ImageCompressHelper {
             sampleSize = (int) (actualHeight / (double) maxHeight);
         }
 
-        AppLogger.i(TAG, "in simple size:" + sampleSize);
+        AppLogger.INSTANCE.i(TAG, "in simple size:" + sampleSize);
 
         decodeOptions.inJustDecodeBounds = false;
         decodeOptions.inSampleSize = sampleSize;
@@ -185,27 +185,27 @@ public class ImageCompressHelper {
             bitmap = BitmapFactory.decodeFile(srcFile, decodeOptions);
         } catch (OutOfMemoryError error) {
             error.printStackTrace();
-            AppLogger.e(TAG, "OutOfMemoryError:" + srcFile + ", size(" + actualWidth + ", " + actualHeight + ")");
+            AppLogger.INSTANCE.e(TAG, "OutOfMemoryError:" + srcFile + ", size(" + actualWidth + ", " + actualHeight + ")");
         }
 
         if (bitmap == null) {
-            AppLogger.e(TAG, "stop compress:decode file error");
+            AppLogger.INSTANCE.e(TAG, "stop compress:decode file error");
             return false;
         }
 
-        AppLogger.i(TAG, "origin bitmap size:(" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
+        AppLogger.INSTANCE.i(TAG, "origin bitmap size:(" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
 
         if (bitmap.getWidth() > maxWidth || bitmap.getHeight() > maxHeight) {
             Bitmap tempBitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
             bitmap.recycle();
             bitmap = tempBitmap;
-            AppLogger.i(TAG, "scale down:(" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
+            AppLogger.INSTANCE.i(TAG, "scale down:(" + bitmap.getWidth() + ", " + bitmap.getHeight() + ")");
         }
 
 
         int degree = ImageUtils.getExifOrientation(srcFile);
         if (degree != 0) {
-            AppLogger.i(TAG, "rotate image from:" + degree);
+            AppLogger.INSTANCE.i(TAG, "rotate image from:" + degree);
             Bitmap rotate = ImageUtils.rotateImage(degree, bitmap);
             bitmap.recycle();
             bitmap = rotate;
@@ -213,15 +213,15 @@ public class ImageCompressHelper {
 
         ImageUtils.saveBitmap(bitmap, dstFile, compressFormat, quality);
 
-        AppLogger.i(TAG, "output file length:" + (int) (new File(dstFile).length() / 1024d) + "kb");
-        AppLogger.i(TAG, "------------------ compress file complete ---------------");
+        AppLogger.INSTANCE.i(TAG, "output file length:" + (int) (new File(dstFile).length() / 1024d) + "kb");
+        AppLogger.INSTANCE.i(TAG, "------------------ compress file complete ---------------");
         return true;
     }
 
     private static boolean rotateImage(String imageFile, String outputFile, int quality, Bitmap.CompressFormat compressFormat) {
         int degree = ImageUtils.getExifOrientation(imageFile);
         if (degree != 0) {
-            AppLogger.i(TAG, "rotate image from:" + degree);
+            AppLogger.INSTANCE.i(TAG, "rotate image from:" + degree);
             Bitmap origin = BitmapFactory.decodeFile(imageFile);
             Bitmap rotate = ImageUtils.rotateImage(degree, origin);
             if (rotate != null) {
@@ -230,8 +230,8 @@ public class ImageCompressHelper {
                 origin.recycle();
                 return true;
             } else {
-                AppLogger.e(TAG, "rotate image failed:" + imageFile);
-                AppLogger.e(TAG, "use origin image");
+                AppLogger.INSTANCE.e(TAG, "rotate image failed:" + imageFile);
+                AppLogger.INSTANCE.e(TAG, "use origin image");
             }
             origin.recycle();
         }

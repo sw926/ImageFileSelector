@@ -107,7 +107,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_from_camera: {
                 initImageFileSelector();
-                mImageFileSelector.takePhoto(this);
+                mImageFileSelector.takePhoto(this, 1);
                 break;
             }
             case R.id.btn_from_sdcard: {

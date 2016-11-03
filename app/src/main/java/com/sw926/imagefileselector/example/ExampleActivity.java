@@ -162,7 +162,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
         switch (v.getId()) {
             case R.id.btn_from_camera: {
                 initImageFileSelector();
-                mImageFileSelector.takePhoto(this);
+                mImageFileSelector.takePhoto(this, 1);
                 break;
             }
             case R.id.btn_from_sdcard: {

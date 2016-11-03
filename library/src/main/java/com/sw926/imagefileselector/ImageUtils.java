@@ -40,7 +40,7 @@ class ImageUtils {
         try {
             exif = new ExifInterface(filepath);
         } catch (IOException ex) {
-            AppLogger.printStackTrace(ex);
+            AppLogger.INSTANCE.printStackTrace(ex);
         }
         if (exif != null) {
             int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, -1);
