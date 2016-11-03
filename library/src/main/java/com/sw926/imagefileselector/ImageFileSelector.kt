@@ -11,17 +11,23 @@ class ImageFileSelector(context: Context) {
 
     private var mCallback: Callback? = null
     private val mImagePickHelper: ImagePickHelper
-    private val mImageTaker: ImageCaptureHelper
+    private val mImageCaptureHelper: ImageCaptureHelper
     private val mImageCompressHelper: ImageCompressHelper
+
+    private val compressParams: CompressParams
 
     init {
 
-        mImageCompressHelper = ImageCompressHelper(context)
-        mImageCompressHelper.setCallback { outFile ->
-//            AppLogger.d(TAG, "compress image output: " + outFile)
-//            if (mCallback != null) {
-//                mCallback!!.onSuccess(outFile)
-//            }
+        val defaultOutputPath = "${context.cacheDir}/images/"
+        compressParams = CompressParams(defaultOutputPath)
+
+        mImageCompressHelper = ImageCompressHelper()
+        mImageCompressHelper.errorCallback = {
+            mCallback?.onError(ErrorResult.error)
+        }
+
+        mImageCompressHelper.successCallback = {
+            mCallback?.onSuccess(it)
         }
 
         val errorCallback: (ErrorResult) -> Unit = {
@@ -29,7 +35,7 @@ class ImageFileSelector(context: Context) {
         }
 
         val successCallback: (String) -> Unit = {
-            mCallback?.onSuccess(it)
+            mImageCompressHelper.compress(CompressJop(it, compressParams))
         }
 
         mImagePickHelper = ImagePickHelper(context)
@@ -37,20 +43,17 @@ class ImageFileSelector(context: Context) {
         mImagePickHelper.successCallback = successCallback
 
 
-        mImageTaker = ImageCaptureHelper()
-        mImageTaker.errorCallback = errorCallback
-        mImageTaker.successCallback = successCallback
+        mImageCaptureHelper = ImageCaptureHelper()
+        mImageCaptureHelper.errorCallback = errorCallback
+        mImageCaptureHelper.successCallback = successCallback
 
     }
 
     fun setOutPutPath(outPutPath: String) {
         val outPutPath1 = outPutPath
-        mImageCompressHelper.setOutputPath(outPutPath)
+        compressParams.outputPath = outPutPath
     }
 
-    fun setMaxOutputFileLength(length: Long) {
-        mImageCompressHelper.setMaxOutputFileLength(length)
-    }
 
     /**
      * 设置压缩后的文件大小
@@ -61,7 +64,8 @@ class ImageFileSelector(context: Context) {
      */
     @SuppressWarnings("unused")
     fun setOutPutImageSize(maxWidth: Int, maxHeight: Int) {
-        mImageCompressHelper.setOutPutImageSize(maxWidth, maxHeight)
+        compressParams.maxWidth = maxWidth
+        compressParams.maxHeight =maxHeight
     }
 
     /**
@@ -71,7 +75,7 @@ class ImageFileSelector(context: Context) {
      */
     @SuppressWarnings("unused")
     fun setQuality(quality: Int) {
-        mImageCompressHelper.setQuality(quality)
+        compressParams.saveQuality = quality
     }
 
     /**
@@ -81,19 +85,19 @@ class ImageFileSelector(context: Context) {
      */
     @SuppressWarnings("unused")
     fun setCompressFormat(compressFormat: Bitmap.CompressFormat) {
-        mImageCompressHelper.setCompressFormat(compressFormat)
+        compressParams.compressFormat = compressFormat
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         mImagePickHelper.onActivityResult(requestCode, resultCode, data)
-        mImageTaker.onActivityResult(requestCode, resultCode, data)
+        mImageCaptureHelper.onActivityResult(requestCode, resultCode, data)
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == mImagePickHelper.mRequestCode) {
             mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        } else if (requestCode == mImageTaker.mRequestCode) {
-            mImageTaker.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        } else if (requestCode == mImageCaptureHelper.mRequestCode) {
+            mImageCaptureHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
 
@@ -116,11 +120,11 @@ class ImageFileSelector(context: Context) {
     }
 
     fun takePhoto(activity: Activity, requestCode: Int) {
-        mImageTaker.captureImage(activity, requestCode)
+        mImageCaptureHelper.captureImage(activity, requestCode)
     }
 
     fun takePhoto(fragment: android.support.v4.app.Fragment, requestCode: Int) {
-        mImageTaker.captureImage(fragment, requestCode)
+        mImageCaptureHelper.captureImage(fragment, requestCode)
     }
 
     interface Callback {
@@ -129,8 +133,6 @@ class ImageFileSelector(context: Context) {
     }
 
     companion object {
-
-        private val TAG = ImageFileSelector::class.java.simpleName
 
         fun setDebug(debug: Boolean) {
             AppLogger.DEBUG = debug

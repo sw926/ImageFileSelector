@@ -151,7 +151,7 @@ public class ImageCropper {
                 Bitmap bitmap = data.getParcelableExtra("data");
                 if (bitmap != null) {
                     AppLogger.INSTANCE.i(TAG, "create output file from data:" + outFile.getPath());
-                    ImageUtils.saveBitmap(bitmap, outFile.getPath(), CompressFormat.JPEG, 80);
+                    ImageUtils.INSTANCE.saveBitmap(bitmap, outFile.getPath(), CompressFormat.JPEG, 80);
                 }
             }
             if (outFile != null && outFile.exists()) {

@@ -12,6 +12,8 @@ import java.io.File
 
 internal class ImagePickHelper(private val mContext: Context) {
 
+    private var TAG = "ImagePickHelper"
+
     var errorCallback: ((ErrorResult) -> Unit)? = null
     var successCallback: ((String) -> Unit)? = null
     private var fragment: Fragment? = null
@@ -41,6 +43,7 @@ internal class ImagePickHelper(private val mContext: Context) {
     }
 
     fun startSelect() {
+        AppLogger.i(TAG, "start select image")
         activity?.let {
             it.startActivityForResult(createIntent(), mRequestCode)
             return
@@ -67,16 +70,20 @@ internal class ImagePickHelper(private val mContext: Context) {
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (requestCode == mRequestCode) {
             if (resultCode == Activity.RESULT_CANCELED) {
+                AppLogger.i(TAG, "canceled select image")
                 errorCallback?.invoke(ErrorResult.canceled)
             } else if (resultCode == Activity.RESULT_OK) {
                 if (intent == null) {
+                    AppLogger.e(TAG, "select image error, intent null")
                     errorCallback?.invoke(ErrorResult.error)
                 } else {
                     val uri = intent.data
                     val path: String? = Compatibility.getPath(mContext, uri)
                     if (!TextUtils.isEmpty(path) && File(path).exists()) {
+                        AppLogger.e(TAG, "select image success: $path")
                         successCallback?.invoke(path!!)
                     } else {
+                        AppLogger.e(TAG, "select image error $path is error or not exists")
                         errorCallback?.invoke(ErrorResult.error)
                     }
                 }
@@ -85,7 +92,7 @@ internal class ImagePickHelper(private val mContext: Context) {
         }
     }
 
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    fun onRequestPermissionsResult(requestCode: Int, @Suppress("UNUSED_PARAMETER") permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == mRequestCode) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startSelect()

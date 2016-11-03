@@ -161,7 +161,7 @@ internal object AppLogger {
             Log.e(tag, buildMessage(msg), thr)
     }
 
-    fun printStackTrace(e: Exception) {
+    fun printStackTrace(e: Throwable) {
         if (DEBUG)
             e.printStackTrace()
     }

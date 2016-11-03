@@ -16,6 +16,7 @@ import java.io.File
 
 class ImageCaptureHelper {
 
+    private val TAG = "ImageCaptureHelper"
     var errorCallback: ((ErrorResult) -> Unit)? = null
     var successCallback: ((String) -> Unit)? = null
 
@@ -36,17 +37,20 @@ class ImageCaptureHelper {
         return null
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, @Suppress("UNUSED_PARAMETER") data: Intent?) {
         getContext()?.let { context ->
             if (requestCode == mRequestCode) {
                 if (resultCode == Activity.RESULT_CANCELED) {
+                    AppLogger.i(TAG, "canceled capture image")
                     errorCallback?.invoke(ErrorResult.canceled)
                 } else if (resultCode == Activity.RESULT_OK) {
                     mCameraTempUri?.let {
                         val file = File(getRealPathFromUri(context, it))
                         if (file.exists()) {
+                            AppLogger.i(TAG, "capture image success: ${file.path}")
                             successCallback?.invoke(file.path)
                         } else {
+                            AppLogger.i(TAG, "capture image error $it")
                             errorCallback?.invoke(ErrorResult.error)
                         }
                     }
@@ -55,7 +59,7 @@ class ImageCaptureHelper {
         }
     }
 
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    fun onRequestPermissionsResult(requestCode: Int, @Suppress("UNUSED_PARAMETER") permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == mRequestCode) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 capture()
@@ -124,6 +128,7 @@ class ImageCaptureHelper {
 
     private fun capture() {
         try {
+            AppLogger.i(TAG, "start capture image")
             getContext()?.let {
                 val values = ContentValues(1)
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
