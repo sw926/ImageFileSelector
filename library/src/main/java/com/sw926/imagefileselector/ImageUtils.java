@@ -8,19 +8,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class ImageUtils {
+class ImageUtils {
 
-    public static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
+    static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
         FileOutputStream fo;
         try {
             File f = new File(filePath);
             if (!f.getParentFile().exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 f.getParentFile().mkdirs();
             }
 
             if (f.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 f.delete();
             }
+            //noinspection ResultOfMethodCallIgnored
             f.createNewFile();
             fo = new FileOutputStream(f, true);
             bmp.compress(format, quality, fo);
@@ -31,7 +34,7 @@ public class ImageUtils {
         }
     }
 
-    public static int getExifOrientation(String filepath) {
+    static int getExifOrientation(String filepath) {
         int degree = 0;
         ExifInterface exif = null;
         try {
@@ -59,7 +62,7 @@ public class ImageUtils {
         return degree;
     }
 
-    public static Bitmap rotateImage(int angle, Bitmap bitmap) {
+    static Bitmap rotateImage(int angle, Bitmap bitmap) {
         try {
             // 旋转图片 动作
             Matrix matrix = new Matrix();
