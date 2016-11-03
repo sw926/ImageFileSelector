@@ -13,8 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sw926.imagefileselector.ErrorResult;
 import com.sw926.imagefileselector.ImageCropper;
 import com.sw926.imagefileselector.ImageFileSelector;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -38,7 +41,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        ImageFileSelector.setDebug(true);
+        ImageFileSelector.Companion.setDebug(true);
 
         findViewById(R.id.btn_from_sdcard).setOnClickListener(this);
         findViewById(R.id.btn_from_camera).setOnClickListener(this);
@@ -53,19 +56,25 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
         mImageFileSelector = new ImageFileSelector(this);
         mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
             @Override
-            public void onSuccess(final String file) {
-                if (!TextUtils.isEmpty(file)) {
-                    loadImage(file);
-                    mCurrentSelectFile = new File(file);
-                    mBtnCrop.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(ExampleActivity.this, "select image file error", Toast.LENGTH_LONG).show();
+            public void onError(@NotNull ErrorResult errorResult) {
+                switch (errorResult) {
+                    case permissionDenied:
+                        Toast.makeText(ExampleActivity.this, "Permission Denied", Toast.LENGTH_LONG).show();
+                        break;
+                    case canceled:
+                        Toast.makeText(ExampleActivity.this, "Canceled", Toast.LENGTH_LONG).show();
+                        break;
+                    case error:
+                        Toast.makeText(ExampleActivity.this, "Unknown Error", Toast.LENGTH_LONG).show();
+                        break;
                 }
             }
 
             @Override
-            public void onError() {
-                Toast.makeText(ExampleActivity.this, "select image file error", Toast.LENGTH_LONG).show();
+            public void onSuccess(@NotNull String file) {
+                loadImage(file);
+                mCurrentSelectFile = new File(file);
+                mBtnCrop.setVisibility(View.VISIBLE);
             }
         });
 
@@ -167,7 +176,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
             }
             case R.id.btn_from_sdcard: {
                 initImageFileSelector();
-                mImageFileSelector.selectImage(this);
+                mImageFileSelector.selectImage(this, 2);
                 break;
             }
             case R.id.btn_crop: {

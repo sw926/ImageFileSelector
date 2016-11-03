@@ -16,7 +16,9 @@ import java.io.File
 
 class ImageCaptureHelper {
 
-    var callback: ((String) -> Unit)? = null
+    var errorCallback: ((ErrorResult) -> Unit)? = null
+    var successCallback: ((String) -> Unit)? = null
+
     private var fragment: Fragment? = null
     private var activity: Activity? = null
     private var mCameraTempUri: Uri? = null
@@ -36,11 +38,17 @@ class ImageCaptureHelper {
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         getContext()?.let { context ->
-            if (requestCode == mRequestCode && resultCode == Activity.RESULT_OK) {
-                mCameraTempUri?.let {
-                    val file = File(getRealPathFromUri(context, it))
-                    if (file.exists()) {
-                        callback?.invoke(file.path)
+            if (requestCode == mRequestCode) {
+                if (resultCode == Activity.RESULT_CANCELED) {
+                    errorCallback?.invoke(ErrorResult.canceled)
+                } else if (resultCode == Activity.RESULT_OK) {
+                    mCameraTempUri?.let {
+                        val file = File(getRealPathFromUri(context, it))
+                        if (file.exists()) {
+                            successCallback?.invoke(file.path)
+                        } else {
+                            errorCallback?.invoke(ErrorResult.error)
+                        }
                     }
                 }
             }
@@ -51,6 +59,8 @@ class ImageCaptureHelper {
         if (requestCode == mRequestCode) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 capture()
+            } else {
+                errorCallback?.invoke(ErrorResult.permissionDenied)
             }
         }
     }

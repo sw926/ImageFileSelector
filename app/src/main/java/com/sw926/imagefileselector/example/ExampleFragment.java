@@ -16,8 +16,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sw926.imagefileselector.ErrorResult;
 import com.sw926.imagefileselector.ImageCropper;
 import com.sw926.imagefileselector.ImageFileSelector;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
@@ -66,21 +69,28 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         mBtnCrop = (Button) view.findViewById(R.id.btn_crop);
 
         mImageFileSelector = new ImageFileSelector(getContext());
+
         mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
             @Override
-            public void onSuccess(final String file) {
-                if (!TextUtils.isEmpty(file)) {
-                    loadImage(file);
-                    mCurrentSelectFile = new File(file);
-                    mBtnCrop.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(getContext(), "select image file error", Toast.LENGTH_LONG).show();
+            public void onError(@NotNull ErrorResult errorResult) {
+                switch (errorResult) {
+                    case permissionDenied:
+                        Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_LONG).show();
+                        break;
+                    case canceled:
+                        Toast.makeText(getContext(), "Canceled", Toast.LENGTH_LONG).show();
+                        break;
+                    case error:
+                        Toast.makeText(getContext(), "Unknown Error", Toast.LENGTH_LONG).show();
+                        break;
                 }
             }
 
             @Override
-            public void onError() {
-                Toast.makeText(getContext(), "select image file error", Toast.LENGTH_LONG).show();
+            public void onSuccess(@NotNull String file) {
+                loadImage(file);
+                mCurrentSelectFile = new File(file);
+                mBtnCrop.setVisibility(View.VISIBLE);
             }
         });
 
@@ -112,7 +122,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
             }
             case R.id.btn_from_sdcard: {
                 initImageFileSelector();
-                mImageFileSelector.selectImage(this);
+                mImageFileSelector.selectImage(this, 2);
                 break;
             }
             case R.id.btn_crop: {
