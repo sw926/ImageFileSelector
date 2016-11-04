@@ -14,6 +14,10 @@ android:
     # Additional components
     - extra-android-m2repository
 
+    licenses:
+        - android-sdk-license-.+
+        - google-gdk-license-.+
+
 before_script:
     - chmod +x gradlew
 

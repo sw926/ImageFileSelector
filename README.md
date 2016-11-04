@@ -4,6 +4,8 @@
 [![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
 [![Get it on Google Play](http://www.android.com/images/brand/get_it_on_play_logo_small.png)](http://play.google.com/store/apps/details?id=com.sw926.imagefileselector.example)
 
+<a href="http://www.methodscount.com/?lib=com.sw926.imagefileselector%3Alibrary%3A1.0.3"><img src="https://img.shields.io/badge/Methods and size-core: 283 | deps: 15157 | 42 KB-e91e63.svg"/></a>
+
 #####支持Android版本：Android 2.2+
 
 使用方法
