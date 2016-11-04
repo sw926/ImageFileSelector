@@ -20,6 +20,8 @@ internal class ImagePickHelper(private val mContext: Context) {
     private var activity: Activity? = null
     var mRequestCode = -1
 
+    var mType = "image/*"
+
     fun selectImage(fragment: Fragment, requestCode: Int) {
         mRequestCode = requestCode
         this.fragment = fragment
@@ -63,7 +65,7 @@ internal class ImagePickHelper(private val mContext: Context) {
             intent = Intent(Intent.ACTION_GET_CONTENT)
         }
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"
+        intent.type = mType
         return intent
     }
 

@@ -50,10 +50,12 @@ class ImageFileSelector(context: Context) {
     }
 
     fun setOutPutPath(outPutPath: String) {
-        val outPutPath1 = outPutPath
         compressParams.outputPath = outPutPath
     }
 
+    fun setSelectFileType(type: String) {
+        mImagePickHelper.mType = type
+    }
 
     /**
      * 设置压缩后的文件大小
@@ -65,7 +67,7 @@ class ImageFileSelector(context: Context) {
     @SuppressWarnings("unused")
     fun setOutPutImageSize(maxWidth: Int, maxHeight: Int) {
         compressParams.maxWidth = maxWidth
-        compressParams.maxHeight =maxHeight
+        compressParams.maxHeight = maxHeight
     }
 
     /**

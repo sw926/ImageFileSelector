@@ -3,6 +3,7 @@ package com.sw926.imagefileselector
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import java.io.File
+import java.util.concurrent.Executors
 
 data class CompressParams(var outputPath: String,
                           var maxWidth: Int = 1000,
@@ -18,7 +19,7 @@ class ImageCompressHelper {
     var successCallback: ((String) -> Unit)? = null
 
     fun compress(jop: CompressJop) {
-        CompressTask().execute(jop)
+        CompressTask().executeOnExecutor(Executors.newCachedThreadPool(), jop)
     }
 
     private inner class CompressTask : AsyncTask<CompressJop, Int, String>() {
