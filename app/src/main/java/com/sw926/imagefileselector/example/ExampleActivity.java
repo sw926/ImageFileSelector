@@ -78,19 +78,27 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        mImageCropper = new ImageCropper(this);
+        mImageCropper = new ImageCropper();
+
         mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
             @Override
-            public void onCropperCallback(ImageCropper.CropperResult result, File srcFile, File outFile) {
-                mCurrentSelectFile = null;
-                mBtnCrop.setVisibility(View.GONE);
-                if (result == ImageCropper.CropperResult.success) {
-                    loadImage(outFile.getPath());
-                } else if (result == ImageCropper.CropperResult.error_illegal_input_file) {
-                    Toast.makeText(ExampleActivity.this, "input file error", Toast.LENGTH_LONG).show();
-                } else if (result == ImageCropper.CropperResult.error_illegal_out_file) {
-                    Toast.makeText(ExampleActivity.this, "output file error", Toast.LENGTH_LONG).show();
+            public void onError(@NotNull ImageCropper.CropperErrorResult result) {
+                switch (result) {
+                    case error:
+                        Toast.makeText(ExampleActivity.this, "crop image error", Toast.LENGTH_LONG).show();
+                        break;
+                    case canceled:
+                        Toast.makeText(ExampleActivity.this, "crop image canceled", Toast.LENGTH_LONG).show();
+                        break;
+                    case notSupport:
+                        Toast.makeText(ExampleActivity.this, "crop image not support", Toast.LENGTH_LONG).show();
+                        break;
                 }
+            }
+
+            @Override
+            public void onSuccess(@NotNull String outputFile) {
+                loadImage(outputFile);
             }
         });
 
@@ -183,7 +191,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
                 if (mCurrentSelectFile != null) {
                     mImageCropper.setOutPut(800, 800);
                     mImageCropper.setOutPutAspect(1, 1);
-                    mImageCropper.cropImage(mCurrentSelectFile);
+                    mImageCropper.cropImage(this, mCurrentSelectFile.getPath(), 3);
                 }
                 break;
             }

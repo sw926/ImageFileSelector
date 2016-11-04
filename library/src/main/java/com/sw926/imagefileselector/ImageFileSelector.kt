@@ -18,7 +18,7 @@ class ImageFileSelector(context: Context) {
 
     init {
 
-        val defaultOutputPath = "${context.cacheDir}/images/"
+        val defaultOutputPath = "${context.externalCacheDir}/images/"
         compressParams = CompressParams(defaultOutputPath)
 
         mImageCompressHelper = ImageCompressHelper()
@@ -103,10 +103,10 @@ class ImageFileSelector(context: Context) {
         }
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
+    fun onSaveInstanceState(outState: Bundle?) {
     }
 
-    fun onRestoreInstanceState(savedInstanceState: Bundle) {
+    fun onRestoreInstanceState(savedInstanceState: Bundle?) {
     }
 
     fun setCallback(callback: Callback) {

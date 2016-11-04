@@ -23,29 +23,33 @@ internal class ImagePickHelper(private val mContext: Context) {
     var mType = "image/*"
 
     fun selectImage(fragment: Fragment, requestCode: Int) {
+        AppLogger.i(TAG, "start select image from fragment")
         mRequestCode = requestCode
         this.fragment = fragment
         this.activity = null
         this.fragment?.let {
             if (PermissionsHelper.checkAndRequestPermission(it, mRequestCode)) {
+                AppLogger.i(TAG, "permission already grant")
                 it.startActivityForResult(createIntent(), mRequestCode)
             }
         }
     }
 
     fun selectorImage(activity: Activity, requestCode: Int) {
+        AppLogger.i(TAG, "start select image from activity")
         mRequestCode = requestCode
         this.activity = activity
         this.fragment = null
         this.activity?.let {
             if (PermissionsHelper.checkAndRequestPermission(it, mRequestCode)) {
+                AppLogger.i(TAG, "permission already grant")
                 it.startActivityForResult(createIntent(), mRequestCode)
             }
         }
     }
 
     fun startSelect() {
-        AppLogger.i(TAG, "start select image")
+        AppLogger.i(TAG, "start system gallery activity")
         activity?.let {
             it.startActivityForResult(createIntent(), mRequestCode)
             return
@@ -55,6 +59,8 @@ internal class ImagePickHelper(private val mContext: Context) {
             it.startActivityForResult(createIntent(), mRequestCode)
             return
         }
+        AppLogger.e(TAG, "activity or fragment is null")
+        errorCallback?.invoke(ErrorResult.error)
     }
 
     private fun createIntent(): Intent {
@@ -82,10 +88,10 @@ internal class ImagePickHelper(private val mContext: Context) {
                     val uri = intent.data
                     val path: String? = Compatibility.getPath(mContext, uri)
                     if (!TextUtils.isEmpty(path) && File(path).exists()) {
-                        AppLogger.e(TAG, "select image success: $path")
+                        AppLogger.i(TAG, "select image success: $path")
                         successCallback?.invoke(path!!)
                     } else {
-                        AppLogger.e(TAG, "select image error $path is error or not exists")
+                        AppLogger.e(TAG, "select image file path $path is error or not exists")
                         errorCallback?.invoke(ErrorResult.error)
                     }
                 }

@@ -93,12 +93,12 @@ mImageFileSelector.selectImage(this);
 ImageCropper mImageCropper = new ImageCropper(this);
 mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
     @Override
-    public void onCropperCallback(ImageCropper.CropperResult errorResult, File srcFile, File outFile) {
-        if (errorResult == ImageCropper.CropperResult.success) {
+    public void onCropperCallback(ImageCropper.CropperErrorResult errorResult, File srcFile, File outFile) {
+        if (errorResult == ImageCropper.CropperErrorResult.success) {
             // 成功
-        } else if (errorResult == ImageCropper.CropperResult.error_illegal_input_file) {
+        } else if (errorResult == ImageCropper.CropperErrorResult.error_illegal_input_file) {
             // 输入的文件失败
-        } else if (errorResult == ImageCropper.CropperResult.error_illegal_out_file) {
+        } else if (errorResult == ImageCropper.CropperErrorResult.error_illegal_out_file) {
             // 输出文件失败
         }
     }
