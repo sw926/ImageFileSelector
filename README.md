@@ -1,3 +1,5 @@
+[中文说明](README-zh.md)
+
 # ImageFileSelector
 ##### Use the system software to select, compress, crop images
 
