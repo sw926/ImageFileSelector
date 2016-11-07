@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 25
+        targetSdkVersion 24
         versionCode 4
         versionName "1.0.3"
     }
@@ -31,7 +31,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-fragment:25.0.0'
+    compile 'com.android.support:support-fragment:24.2.1'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
