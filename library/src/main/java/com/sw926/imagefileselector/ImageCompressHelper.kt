@@ -2,6 +2,7 @@ package com.sw926.imagefileselector
 
 import android.graphics.Bitmap
 import android.os.AsyncTask
+import android.os.Build
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -19,7 +20,11 @@ class ImageCompressHelper {
     var successCallback: ((String) -> Unit)? = null
 
     fun compress(jop: CompressJop) {
-        CompressTask().executeOnExecutor(Executors.newCachedThreadPool(), jop)
+        if (Build.VERSION.SDK_INT >= 11) {
+            CompressTask().executeOnExecutor(Executors.newCachedThreadPool(), jop)
+        } else {
+            CompressTask().execute(jop)
+        }
     }
 
     private inner class CompressTask : AsyncTask<CompressJop, Int, String>() {
