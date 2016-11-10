@@ -1,7 +1,7 @@
 <paths>
     <external-path
         name="files_root"
-        path="Android/data/com.sw926.imagefileselector.example/"/>
+        path="images"/>
     <external-path
         name="external_storage_root"
         path="."/>
