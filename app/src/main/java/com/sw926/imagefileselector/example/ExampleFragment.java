@@ -20,8 +20,6 @@ import com.sw926.imagefileselector.ErrorResult;
 import com.sw926.imagefileselector.ImageCropper;
 import com.sw926.imagefileselector.ImageFileSelector;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 
 
@@ -72,7 +70,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
 
         mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
             @Override
-            public void onError(@NotNull ErrorResult errorResult) {
+            public void onError(ErrorResult errorResult) {
                 switch (errorResult) {
                     case permissionDenied:
                         Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_LONG).show();
@@ -87,7 +85,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onSuccess(@NotNull String file) {
+            public void onSuccess(String file) {
                 loadImage(file);
                 mCurrentSelectFile = new File(file);
                 mBtnCrop.setVisibility(View.VISIBLE);
@@ -97,7 +95,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         mImageCropper = new ImageCropper();
         mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
             @Override
-            public void onError(@NotNull ImageCropper.CropperErrorResult result) {
+            public void onError(ImageCropper.CropperErrorResult result) {
                 switch (result) {
                     case error:
                         Toast.makeText(getContext(), "crop image error", Toast.LENGTH_LONG).show();
@@ -112,7 +110,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onSuccess(@NotNull String outputFile) {
+            public void onSuccess(String outputFile) {
                 loadImage(outputFile);
             }
         });
