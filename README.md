@@ -5,7 +5,7 @@
 
 [![Get it on Google Play](http://www.android.com/images/brand/get_it_on_play_logo_small.png)](http://play.google.com/store/apps/details?id=com.sw926.imagefileselector.example)
 
-<a href="http://www.methodscount.com/?lib=com.sw926.imagefileselector%3Alibrary%3A%2B"><img src="https://img.shields.io/badge/Methods and size-core: 363 | deps: 16079 | 53 KB-e91e63.svg"/></a>
+<a href="http://www.methodscount.com/?lib=com.sw926.imagefileselector%3Alibrary%3A%2B"><img src="https://img.shields.io/badge/Methods and size-core: 273 | deps: 10413 | 33 KB-e91e63.svg"/></a>
 
 #####support Android 2.3+
 
