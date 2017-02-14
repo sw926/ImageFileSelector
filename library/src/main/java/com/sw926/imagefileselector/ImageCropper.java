@@ -208,15 +208,17 @@ public class ImageCropper {
             mSrcFile = inputFile;
             mOutFile = outFile;
 
+            String providerName = getContext().getPackageName() + ".com.sw926.imagefileprovider";
             Uri uri;
             if (inputFile.getPath().contains("%")) {
                 String ext = srcFile.substring(srcFile.lastIndexOf("."));
                 mTempFile = CommonUtils.generateExternalImageCacheFile(context, ext);
                 CommonUtils.copy(inputFile, mTempFile);
-                uri = FileProvider.getUriForFile(context, "com.sw926.fileprovider", mTempFile);
+
+                uri = FileProvider.getUriForFile(context, providerName, mTempFile);
                 AppLogger.w(TAG, "use temp file:" + mTempFile.getPath());
             } else {
-                uri = FileProvider.getUriForFile(context, "com.sw926.fileprovider", inputFile);
+                uri = FileProvider.getUriForFile(context, providerName, inputFile);
             }
 
             Intent intent = new Intent("com.android.camera.action.CROP");
@@ -272,7 +274,7 @@ public class ImageCropper {
         }
     }
 
-   public interface ImageCropperCallback {
+    public interface ImageCropperCallback {
         void onError(CropperErrorResult result);
 
         void onSuccess(String outputFile);
