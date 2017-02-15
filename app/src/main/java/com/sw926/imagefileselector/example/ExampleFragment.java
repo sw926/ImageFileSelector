@@ -185,7 +185,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mImageFileSelector.onActivityResult(requestCode, resultCode, data);
+        mImageFileSelector.onActivityResult(getContext(), requestCode, resultCode, data);
         mImageCropper.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -207,6 +207,6 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mImageFileSelector.onRequestPermissionsResult(getContext(), requestCode, permissions, grantResults);
     }
 }

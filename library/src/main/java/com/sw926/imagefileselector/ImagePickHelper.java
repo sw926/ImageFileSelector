@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
@@ -44,7 +45,7 @@ class ImagePickHelper {
         mCallback = callback;
     }
 
-    void selectImage(Fragment fragment, int requestCode) {
+    public void selectImage(Fragment fragment, int requestCode) {
         AppLogger.i(TAG, "start select image from fragment");
         mRequestCode = requestCode;
         this.mFragment = fragment;
@@ -57,7 +58,7 @@ class ImagePickHelper {
         }
     }
 
-    void selectorImage(Activity activity, int requestCode) {
+    public void selectorImage(Activity activity, int requestCode) {
         AppLogger.i(TAG, "start select image from activity");
         mRequestCode = requestCode;
         this.mActivity = activity;
@@ -87,9 +88,7 @@ class ImagePickHelper {
         }
     }
 
-    private Intent createIntent()
-
-    {
+    private Intent createIntent() {
         Intent intent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -101,7 +100,20 @@ class ImagePickHelper {
         return intent;
     }
 
-    void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+    public void onSaveInstanceState(Bundle outState) {
+        if (mRequestCode > 0) {
+            outState.putInt("image_pick_request_code", mRequestCode);
+        }
+    }
+
+    public void onRestoreInstanceState(Bundle outState) {
+        if (outState.containsKey("image_pick_request_code")) {
+            mRequestCode = outState.getInt("image_pick_request_code");
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == mRequestCode) {
             if (resultCode == Activity.RESULT_CANCELED) {
                 AppLogger.i(TAG, "canceled select image");
@@ -134,7 +146,7 @@ class ImagePickHelper {
         }
     }
 
-    void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == mRequestCode) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startSelect();

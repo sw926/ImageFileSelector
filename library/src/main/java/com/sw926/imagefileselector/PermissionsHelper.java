@@ -36,7 +36,7 @@ public class PermissionsHelper {
         }
     }
 
-    private static boolean isHavePermission(Context context) {
+    public static boolean isHavePermission(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 return false;

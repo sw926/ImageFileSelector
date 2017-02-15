@@ -106,7 +106,7 @@ public class ImageCropper {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == mRequestCode) {
+        if (mRequestCode > 0 && requestCode == mRequestCode) {
             if (resultCode == Activity.RESULT_CANCELED) {
                 if (mCallback != null) {
                     mCallback.onError(CropperErrorResult.canceled);
@@ -152,10 +152,9 @@ public class ImageCropper {
                     return;
                 }
             }
-        }
-
-        if (mCallback != null) {
-            mCallback.onError(CropperErrorResult.error);
+            if (mCallback != null) {
+                mCallback.onError(CropperErrorResult.error);
+            }
         }
     }
 

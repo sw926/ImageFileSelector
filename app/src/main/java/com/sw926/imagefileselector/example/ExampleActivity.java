@@ -136,7 +136,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mImageFileSelector.onActivityResult(requestCode, resultCode, data);
+        mImageFileSelector.onActivityResult(this, requestCode, resultCode, data);
         mImageCropper.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -158,7 +158,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mImageFileSelector.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 
     private void initImageFileSelector() {

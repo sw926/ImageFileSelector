@@ -47,15 +47,17 @@ public class ImageFileSelector {
             @Override
             public void onError(ErrorResult errorResult) {
                 if (mCallback != null) {
+
                     mCallback.onError(errorResult);
                 }
             }
 
             @Override
             public void onSuccess(String file) {
-                if (mCallback != null) {
-                    mCallback.onSuccess(file);
-                }
+                ImageCompressHelper.CompressJop jop = new ImageCompressHelper.CompressJop();
+                jop.params = compressParams;
+                jop.inputFile = file;
+                mImageCompressHelper.compress(jop);
             }
         };
 
@@ -64,15 +66,14 @@ public class ImageFileSelector {
 
         mImageCaptureHelper = new ImageCaptureHelper();
         mImageCaptureHelper.setCallback(callback);
-
     }
 
 
-    void setOutPutPath(String outPutPath) {
+    public void setOutPutPath(String outPutPath) {
         compressParams.outputPath = outPutPath;
     }
 
-    void setSelectFileType(String type) {
+    public void setSelectFileType(String type) {
         mImagePickHelper.setType(type);
     }
 
@@ -95,7 +96,7 @@ public class ImageFileSelector {
      * @param quality 图片质量 0 - 100
      */
     @SuppressWarnings("unused")
-    void setQuality(int quality) {
+    public void setQuality(int quality) {
         compressParams.saveQuality = quality;
     }
 
@@ -105,27 +106,39 @@ public class ImageFileSelector {
      * @param compressFormat compress format
      */
     @SuppressWarnings("unused")
-    void setCompressFormat(Bitmap.CompressFormat compressFormat) {
+    public void setCompressFormat(Bitmap.CompressFormat compressFormat) {
         compressParams.compressFormat = compressFormat;
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(Context context, int requestCode, int resultCode, Intent data) {
         mImagePickHelper.onActivityResult(requestCode, resultCode, data);
-        mImageCaptureHelper.onActivityResult(requestCode, resultCode, data);
+        mImageCaptureHelper.onActivityResult(context, requestCode, resultCode, data);
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(Context context, int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == mImagePickHelper.getRequestCode()) {
             mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
         } else if (requestCode == mImageCaptureHelper.getRequestCode()) {
-            mImageCaptureHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            mImageCaptureHelper.onRequestPermissionsResult(context, requestCode, permissions, grantResults);
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
+        if (mImageCaptureHelper != null) {
+            mImageCaptureHelper.onSaveInstanceState(outState);
+        }
+        if (mImagePickHelper != null) {
+            mImagePickHelper.onSaveInstanceState(outState);
+        }
     }
 
     public void onRestoreInstanceState(Bundle outState) {
+        if (mImageCaptureHelper != null) {
+            mImageCaptureHelper.onRestoreInstanceState(outState);
+        }
+        if (mImagePickHelper != null) {
+            mImagePickHelper.onRestoreInstanceState(outState);
+        }
     }
 
     public void setCallback(@Nullable Callback callback) {
@@ -136,7 +149,7 @@ public class ImageFileSelector {
         mImagePickHelper.selectorImage(activity, requestCode);
     }
 
-   public void selectImage(Fragment fragment, int requestCode) {
+    public void selectImage(Fragment fragment, int requestCode) {
         mImagePickHelper.selectImage(fragment, requestCode);
     }
 
@@ -159,6 +172,7 @@ public class ImageFileSelector {
 
     public interface Callback {
         void onError(ErrorResult errorResult);
+
         void onSuccess(String file);
     }
 }
