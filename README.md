@@ -30,6 +30,23 @@ compile 'com.sw926.imagefileselector:library:1.0.6'
 Select Image
 ----------
 Init
+Add to AndroidManifest.xml
+```
+<application>
+    ...
+    <provider
+        android:name="android.support.v4.content.FileProvider"
+        android:authorities="{your pacekage name}.com.sw926.imagefileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/files"/>
+    </provider>
+    ...
+</application>
+```
+
 ``` java
 ImageFileSelector mImageFileSelector = new ImageFileSelector(this);
 mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
@@ -55,7 +72,7 @@ Add code to you Activity or Fragment
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    mImageFileSelector.onActivityResult(requestCode, resultCode, data);
+    mImageFileSelector.onActivityResult(this, requestCode, resultCode, data);
 }
 
 @Override
@@ -73,7 +90,7 @@ protected void onRestoreInstanceState(Bundle savedInstanceState) {
 @Override
 public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    mImageFileSelector.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
 }
 ```
 Setting parameters
