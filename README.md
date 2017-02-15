@@ -30,6 +30,7 @@ compile 'com.sw926.imagefileselector:library:1.0.7'
 Select Image
 ----------
 Init
+
 Add to AndroidManifest.xml
 ```
 <application>
