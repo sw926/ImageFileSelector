@@ -154,6 +154,13 @@ public class ImageCaptureHelper {
     }
 
     private void capture(Context context) {
+        if (CommonUtils.hasSDCardMounted()) {
+            if (mCallback != null) {
+                mCallback.onError(ErrorResult.error);
+            }
+            return;
+        }
+
         try {
             AppLogger.i(TAG, "start capture image");
             if (context != null) {
@@ -171,7 +178,10 @@ public class ImageCaptureHelper {
                 mFragment.startActivityForResult(createIntent(), mRequestCode);
             }
 
-        } catch (ActivityNotFoundException e) {
+        } catch (Throwable e) {
+            if (mCallback != null) {
+                mCallback.onError(ErrorResult.error);
+            }
             AppLogger.printStackTrace(e);
         }
     }

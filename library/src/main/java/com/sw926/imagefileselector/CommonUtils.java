@@ -90,4 +90,9 @@ public class CommonUtils {
         }
         return file;
     }
+
+    public static boolean hasSDCardMounted() {
+        String state = Environment.getExternalStorageState();
+        return state != null && state.equals(Environment.MEDIA_MOUNTED);
+    }
 }
