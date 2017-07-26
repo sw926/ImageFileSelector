@@ -21,7 +21,7 @@ import static com.sw926.imagefileselector.ErrorResult.error;
 import static com.sw926.imagefileselector.ErrorResult.permissionDenied;
 
 
-class ImageCaptureHelper {
+public class ImageCaptureHelper {
 
     private static final String TAG = "ImageCaptureHelper";
 

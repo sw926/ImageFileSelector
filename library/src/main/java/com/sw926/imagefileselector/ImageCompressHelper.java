@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.concurrent.Executors;
 
 
-class ImageCompressHelper {
+public class ImageCompressHelper {
 
     public static class CompressParams implements Parcelable {
         String outputPath;
