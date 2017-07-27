@@ -2,7 +2,6 @@ package com.sw926.imagefileselector;
 
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -154,7 +153,7 @@ public class ImageCaptureHelper {
     }
 
     private void capture(Context context) {
-        if (CommonUtils.hasSDCardMounted()) {
+        if (!CommonUtils.hasSDCardMounted()) {
             if (mCallback != null) {
                 mCallback.onError(ErrorResult.error);
             }
