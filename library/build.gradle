@@ -30,8 +30,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:support-fragment:25.3.1'
 }
-
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+//https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle
+apply from: '../gradle-mvn-push.gradle'
 repositories {
     mavenCentral()
 }
