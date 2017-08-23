@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -13,7 +14,7 @@ import java.util.concurrent.Executors;
 public class ImageCompressHelper {
 
     public static class CompressParams implements Parcelable {
-        String outputPath;
+        @Nullable String outputPath;
         int maxWidth = 1000;
         int maxHeight = 1000;
         int saveQuality = 80;
@@ -121,6 +122,10 @@ public class ImageCompressHelper {
 
             Bitmap.CompressFormat format = param.compressFormat == null ? CompressFormatUtils.parseFormat(jop.inputFile) : param.compressFormat;
             AppLogger.i(TAG, "use compress format:" + format.name());
+
+            if (param.outputPath == null) {
+                return null;
+            }
 
             File parentDir = new File(param.outputPath);
             if (!parentDir.exists()) {
