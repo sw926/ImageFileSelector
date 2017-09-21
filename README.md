@@ -24,30 +24,13 @@ Maven
 Gradle
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.7'
+compile 'com.sw926.imagefileselector:library:1.0.8'
 ```
 
 
 Select Image
 ----------
 Init
-
-Add to AndroidManifest.xml
-```
-<application>
-    ...
-    <provider
-        android:name="android.support.v4.content.FileProvider"
-        android:authorities="{your pacekage name}.com.sw926.imagefileprovider"
-        android:exported="false"
-        android:grantUriPermissions="true">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/files"/>
-    </provider>
-    ...
-</application>
-```
 
 ``` java
 ImageFileSelector mImageFileSelector = new ImageFileSelector(this);
