@@ -179,7 +179,8 @@ public class ImageCaptureHelper {
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
 
                 String fileName = "img_" + System.currentTimeMillis() + ".jpg";
-                mOutputFile = new File(context.getExternalCacheDir() + "/images/", fileName);
+                mOutputFile = new File(context.getExternalCacheDir(), fileName);
+                AppLogger.d(TAG, "capture ouput file: " + mOutputFile);
             }
 
             if (mActivity != null) {
