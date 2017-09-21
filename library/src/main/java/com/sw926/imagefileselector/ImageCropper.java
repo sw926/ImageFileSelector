@@ -207,7 +207,7 @@ public class ImageCropper {
             mSrcFile = inputFile;
             mOutFile = outFile;
 
-            String providerName = getContext().getPackageName() + ".com.sw926.imagefileprovider";
+            String providerName = getContext().getPackageName() + ".com.sw926.imagefileselector.provider";
             Uri uri;
             if (inputFile.getPath().contains("%")) {
                 String ext = srcFile.substring(srcFile.lastIndexOf("."));

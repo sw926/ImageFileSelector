@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 @SuppressWarnings("unused")
 public class ImageFileSelector {
 
+    private static final String TAG = "ImageFileSelector";
+
     @Nullable
     private Callback mCallback = null;
     private ImagePickHelper mImagePickHelper;
@@ -44,29 +46,11 @@ public class ImageFileSelector {
             }
         });
 
-        Callback callback = new Callback() {
-            @Override
-            public void onError(ErrorResult errorResult) {
-                if (mCallback != null) {
-
-                    mCallback.onError(errorResult);
-                }
-            }
-
-            @Override
-            public void onSuccess(String file) {
-                ImageCompressHelper.CompressJop jop = new ImageCompressHelper.CompressJop();
-                jop.params = compressParams;
-                jop.inputFile = file;
-                mImageCompressHelper.compress(jop);
-            }
-        };
-
         mImagePickHelper = new ImagePickHelper(context);
-        mImagePickHelper.setCallback(callback);
+        mImagePickHelper.setCallback(new ImageGetCallback(false));
 
         mImageCaptureHelper = new ImageCaptureHelper();
-        mImageCaptureHelper.setCallback(callback);
+        mImageCaptureHelper.setCallback(new ImageGetCallback(true));
     }
 
 
@@ -155,11 +139,11 @@ public class ImageFileSelector {
     }
 
     public void takePhoto(Activity activity, int requestCode) {
-        mImageCaptureHelper.captureImage(activity, requestCode, mDefaultOutputPath);
+        mImageCaptureHelper.captureImage(activity, requestCode);
     }
 
     public void takePhoto(Fragment fragment, int requestCode) {
-        mImageCaptureHelper.captureImage(fragment, requestCode, mDefaultOutputPath);
+        mImageCaptureHelper.captureImage(fragment, requestCode);
     }
 
 
@@ -167,9 +151,33 @@ public class ImageFileSelector {
         AppLogger.DEBUG = debug;
     }
 
-    /**
-     * Created by sunwei on 10/11/2016 2:36 PM.
-     */
+    private class ImageGetCallback implements Callback {
+        private final boolean mDeleteOutputFile;
+
+        private ImageGetCallback(boolean mDeleteOutputFile) {
+            this.mDeleteOutputFile = mDeleteOutputFile;
+        }
+
+
+        @Override
+        public void onError(ErrorResult errorResult) {
+            if (mCallback != null) {
+                mCallback.onError(errorResult);
+            }
+        }
+
+        @Override
+        public void onSuccess(String file) {
+
+            AppLogger.d(TAG, "get file: " + file);
+
+            ImageCompressHelper.CompressJop jop = new ImageCompressHelper.CompressJop();
+            jop.params = compressParams;
+            jop.inputFile = file;
+            jop.deleteInputFile = mDeleteOutputFile;
+            mImageCompressHelper.compress(jop);
+        }
+    }
 
     public interface Callback {
         void onError(ErrorResult errorResult);

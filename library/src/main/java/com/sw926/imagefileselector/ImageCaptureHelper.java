@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 
 import java.io.File;
 
@@ -28,13 +29,15 @@ public class ImageCaptureHelper {
     @Nullable
     private ImageFileSelector.Callback mCallback;
 
+//    @Nullable
+//    private Uri mCameraTempUri;
+
     @Nullable
-    private Uri mCameraTempUri;
+    private File mOutputFile;
 
     private Fragment mFragment = null;
     private Activity mActivity = null;
     private int mRequestCode = -1;
-    private String mOutputDir = null;
 
     public int getRequestCode() {
         return mRequestCode;
@@ -45,11 +48,13 @@ public class ImageCaptureHelper {
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        if (mRequestCode > 0) {
-            outState.putInt("image_capture_request_code", mRequestCode);
-        }
-        if (mCameraTempUri != null) {
-            outState.putParcelable("camera_uri", mCameraTempUri);
+        if (outState != null) {
+            if (mRequestCode > 0) {
+                outState.putInt("image_capture_request_code", mRequestCode);
+            }
+            if (mOutputFile != null) {
+                outState.putString("output_file", mOutputFile.getPath());
+            }
         }
     }
 
@@ -58,8 +63,11 @@ public class ImageCaptureHelper {
             if (outState.containsKey("image_capture_request_code")) {
                 mRequestCode = outState.getInt("image_capture_request_code");
             }
-            if (outState.containsKey("camera_uri")) {
-                mCameraTempUri = outState.getParcelable("camera_uri");
+            if (outState.containsKey("output_file")) {
+                String outputFilePath = outState.getString("output_file");
+                if (!TextUtils.isEmpty(outputFilePath)) {
+                    mOutputFile = new File(outputFilePath);
+                }
             }
         }
     }
@@ -73,15 +81,14 @@ public class ImageCaptureHelper {
                         mCallback.onError(canceled);
                     }
                 } else if (resultCode == Activity.RESULT_OK) {
-                    if (mCameraTempUri != null) {
-                        File file = new File(getRealPathFromUri(context, mCameraTempUri));
-                        if (file.exists()) {
-                            AppLogger.i(TAG, "capture image success: " + file.getPath());
+                    if (mOutputFile != null) {
+                        if (mOutputFile.exists()) {
+                            AppLogger.i(TAG, "capture image success: " + mOutputFile.getPath());
                             if (mCallback != null) {
-                                mCallback.onSuccess(file.getPath());
+                                mCallback.onSuccess(mOutputFile.getPath());
                             }
                         } else {
-                            AppLogger.i(TAG, "capture image error " + file.getPath());
+                            AppLogger.i(TAG, "capture image error " + mOutputFile.getPath());
                             if (mCallback != null) {
                                 mCallback.onError(error);
                             }
@@ -126,15 +133,15 @@ public class ImageCaptureHelper {
     private Intent createIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        if (mCameraTempUri != null) {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraTempUri);
+        if (mOutputFile != null) {
+            Uri cameraTempUri = FileProvider.getUriForFile(mActivity, mActivity.getApplicationContext().getPackageName() + ".com.sw926.imagefileselector.provider", mOutputFile);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri);
             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
         }
         return intent;
     }
 
-    public void captureImage(Activity activity, int requestCode, String outputDir) {
-        mOutputDir = outputDir;
+    public void captureImage(Activity activity, int requestCode) {
         this.mRequestCode = requestCode;
         this.mActivity = activity;
         this.mFragment = null;
@@ -145,8 +152,7 @@ public class ImageCaptureHelper {
             }
     }
 
-    public void captureImage(Fragment fragment, int requestCode, String outputDir) {
-        mOutputDir = outputDir;
+    public void captureImage(Fragment fragment, int requestCode) {
         this.mRequestCode = requestCode;
         this.mActivity = null;
         this.mFragment = fragment;
@@ -173,10 +179,7 @@ public class ImageCaptureHelper {
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
 
                 String fileName = "img_" + System.currentTimeMillis() + ".jpg";
-                File outputFile = new File(mOutputDir, fileName);
-
-                mCameraTempUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".com.sw926.imagefileselector.provider", outputFile);
-//                mCameraTempUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                mOutputFile = new File(context.getExternalCacheDir() + "/images/", fileName);
             }
 
             if (mActivity != null) {

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -14,7 +15,8 @@ import java.util.concurrent.Executors;
 public class ImageCompressHelper {
 
     public static class CompressParams implements Parcelable {
-        @Nullable String outputPath;
+        @Nullable
+        String outputPath;
         int maxWidth = 1000;
         int maxHeight = 1000;
         int saveQuality = 80;
@@ -63,6 +65,10 @@ public class ImageCompressHelper {
     public static class CompressJop implements Parcelable {
         String inputFile;
         CompressParams params;
+        boolean deleteInputFile = false;
+
+        public CompressJop() {
+        }
 
         @Override
         public int describeContents() {
@@ -73,17 +79,16 @@ public class ImageCompressHelper {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(this.inputFile);
             dest.writeParcelable(this.params, flags);
-        }
-
-        public CompressJop() {
+            dest.writeByte(this.deleteInputFile ? (byte) 1 : (byte) 0);
         }
 
         protected CompressJop(Parcel in) {
             this.inputFile = in.readString();
             this.params = in.readParcelable(CompressParams.class.getClassLoader());
+            this.deleteInputFile = in.readByte() != 0;
         }
 
-        public static final Parcelable.Creator<CompressJop> CREATOR = new Parcelable.Creator<CompressJop>() {
+        public static final Creator<CompressJop> CREATOR = new Creator<CompressJop>() {
             @Override
             public CompressJop createFromParcel(Parcel source) {
                 return new CompressJop(source);
@@ -124,6 +129,7 @@ public class ImageCompressHelper {
             AppLogger.i(TAG, "use compress format:" + format.name());
 
             if (param.outputPath == null) {
+                clearJop(jop);
                 return null;
             }
 
@@ -138,9 +144,11 @@ public class ImageCompressHelper {
                 ImageUtils.saveBitmap(bitmap, outputFile.getPath(), format, param.saveQuality);
                 if (outputFile.exists()) {
                     AppLogger.i(TAG, "compress success, output file: " + outputFile.getPath());
+                    clearJop(jop);
                     return outputFile.getPath();
                 }
             }
+            clearJop(jop);
             return null;
         }
 
@@ -157,8 +165,23 @@ public class ImageCompressHelper {
                 }
             }
         }
-
     }
+
+    /**
+     * clear temp file when job finished
+     *
+     * @param jop
+     */
+    private void clearJop(@NonNull CompressJop jop) {
+        if (jop.deleteInputFile) {
+            File file = new File(jop.inputFile);
+            if (file.exists()) {
+                AppLogger.w(TAG, "delete input file: " + file.getAbsolutePath());
+                file.delete();
+            }
+        }
+    }
+
 
     interface Callback {
         void onError();
