@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 
 import java.io.File;
 
@@ -33,6 +34,7 @@ public class ImageCaptureHelper {
     private Fragment mFragment = null;
     private Activity mActivity = null;
     private int mRequestCode = -1;
+    private String mOutputDir = null;
 
     public int getRequestCode() {
         return mRequestCode;
@@ -51,12 +53,14 @@ public class ImageCaptureHelper {
         }
     }
 
-    public void onRestoreInstanceState(Bundle outState) {
-        if (outState.containsKey("image_capture_request_code")) {
-            mRequestCode = outState.getInt("image_capture_request_code");
-        }
-        if (outState.containsKey("camera_uri")) {
-            mCameraTempUri = outState.getParcelable("camera_uri");
+    public void onRestoreInstanceState(@Nullable Bundle outState) {
+        if (outState != null) {
+            if (outState.containsKey("image_capture_request_code")) {
+                mRequestCode = outState.getInt("image_capture_request_code");
+            }
+            if (outState.containsKey("camera_uri")) {
+                mCameraTempUri = outState.getParcelable("camera_uri");
+            }
         }
     }
 
@@ -129,7 +133,8 @@ public class ImageCaptureHelper {
         return intent;
     }
 
-    public void captureImage(Activity activity, int requestCode) {
+    public void captureImage(Activity activity, int requestCode, String outputDir) {
+        mOutputDir = outputDir;
         this.mRequestCode = requestCode;
         this.mActivity = activity;
         this.mFragment = null;
@@ -140,7 +145,8 @@ public class ImageCaptureHelper {
             }
     }
 
-    public void captureImage(Fragment fragment, int requestCode) {
+    public void captureImage(Fragment fragment, int requestCode, String outputDir) {
+        mOutputDir = outputDir;
         this.mRequestCode = requestCode;
         this.mActivity = null;
         this.mFragment = fragment;
@@ -165,7 +171,12 @@ public class ImageCaptureHelper {
             if (context != null) {
                 ContentValues values = new ContentValues(1);
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
-                mCameraTempUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+                String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+                File outputFile = new File(mOutputDir, fileName);
+
+                mCameraTempUri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".com.sw926.imagefileselector.provider", outputFile);
+//                mCameraTempUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             }
 
             if (mActivity != null) {

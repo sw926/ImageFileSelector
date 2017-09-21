@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
@@ -107,8 +108,8 @@ class ImagePickHelper {
         }
     }
 
-    public void onRestoreInstanceState(Bundle outState) {
-        if (outState.containsKey("image_pick_request_code")) {
+    public void onRestoreInstanceState(@Nullable Bundle outState) {
+        if (outState != null && outState.containsKey("image_pick_request_code")) {
             mRequestCode = outState.getInt("image_pick_request_code");
         }
     }

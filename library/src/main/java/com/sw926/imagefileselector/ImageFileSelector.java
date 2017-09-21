@@ -18,12 +18,13 @@ public class ImageFileSelector {
     private ImageCompressHelper mImageCompressHelper;
 
     public ImageCompressHelper.CompressParams compressParams;
+    private final String mDefaultOutputPath;
 
     public ImageFileSelector(Context context) {
+        mDefaultOutputPath = context.getExternalCacheDir() + "/images/";
 
-        String defaultOutputPath = context.getExternalCacheDir() + "/images/";
         compressParams = new ImageCompressHelper.CompressParams();
-        compressParams.outputPath = defaultOutputPath;
+        compressParams.outputPath = mDefaultOutputPath;
 
         mImageCompressHelper = new ImageCompressHelper();
         mImageCompressHelper.setCallback(new ImageCompressHelper.Callback() {
@@ -154,11 +155,11 @@ public class ImageFileSelector {
     }
 
     public void takePhoto(Activity activity, int requestCode) {
-        mImageCaptureHelper.captureImage(activity, requestCode);
+        mImageCaptureHelper.captureImage(activity, requestCode, mDefaultOutputPath);
     }
 
     public void takePhoto(Fragment fragment, int requestCode) {
-        mImageCaptureHelper.captureImage(fragment, requestCode);
+        mImageCaptureHelper.captureImage(fragment, requestCode, mDefaultOutputPath);
     }
 
 

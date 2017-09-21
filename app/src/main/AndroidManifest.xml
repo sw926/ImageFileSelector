@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.sw926.imagefileselector.example">
+    package="com.sw926.imagefileselector.example">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
@@ -11,27 +11,18 @@
             android:name=".ExampleActivity"
             android:configChanges="keyboardHidden"
             android:label="From Activity"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".LaunchActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ExampleFragmentActivity"
-            android:label="From Fragment"/>
+            android:label="From Fragment" />
 
-        <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.sw926.imagefileselector.example.com.sw926.imagefileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/files"/>
-        </provider>
     </application>
 
 </manifest>
