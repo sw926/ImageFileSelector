@@ -18,13 +18,13 @@ Maven
 <dependency>
     <groupId>com.sw926.imagefileselector</groupId>
     <artifactId>library</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 </dependency>
 ```
 Gradle
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.8'
+compile 'com.sw926.imagefileselector:library:1.0.9'
 ```
 
 
