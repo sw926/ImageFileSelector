@@ -1,13 +1,14 @@
 package com.sw926.imagefileselector;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -24,11 +25,28 @@ class ImagePickHelper {
     private final Context mContext;
 
     private ImageFileSelector.Callback mCallback;
+    @Nullable
     private Fragment mFragment = null;
+    @Nullable
     private Activity mActivity = null;
     private int mRequestCode = -1;
 
     private String mType = "image/*";
+
+    private PermissionsHelper mPermissionsHelper = new PermissionsHelper();
+
+    private PermissionsHelper.Callback mPermissionCallback = new PermissionsHelper.Callback() {
+        @Override
+        public void onRequestPermissionsCallback(boolean isGranted) {
+            if (isGranted) {
+                startSelect();
+            } else {
+                if (mCallback != null) {
+                    mCallback.onError(permissionDenied);
+                }
+            }
+        }
+    };
 
     ImagePickHelper(Context context) {
         mContext = context;
@@ -46,33 +64,33 @@ class ImagePickHelper {
         mCallback = callback;
     }
 
-    public void selectImage(Fragment fragment, int requestCode) {
+    public void selectImage(@NonNull Fragment fragment, int requestCode) {
         AppLogger.i(TAG, "start select image from fragment");
         mRequestCode = requestCode;
         this.mFragment = fragment;
         this.mActivity = null;
-        if (fragment != null) {
-            if (PermissionsHelper.checkAndRequestPermission(mFragment, mRequestCode)) {
-                AppLogger.i(TAG, "permission already grant");
-                mFragment.startActivityForResult(createIntent(), mRequestCode);
-            }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mPermissionsHelper.checkAndRequestPermission(mFragment, mRequestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else {
+            startSelect();
         }
     }
 
-    public void selectorImage(Activity activity, int requestCode) {
+    public void selectorImage(@NonNull Activity activity, int requestCode) {
         AppLogger.i(TAG, "start select image from activity");
         mRequestCode = requestCode;
         this.mActivity = activity;
         this.mFragment = null;
-        if (this.mActivity != null) {
-            if (PermissionsHelper.checkAndRequestPermission(mActivity, mRequestCode)) {
-                AppLogger.i(TAG, "permission already grant");
-                mActivity.startActivityForResult(createIntent(), mRequestCode);
-            }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mPermissionsHelper.checkAndRequestPermission(mActivity, mRequestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else {
+            startSelect();
         }
     }
 
-    void startSelect() {
+    private void startSelect() {
         AppLogger.i(TAG, "start system gallery activity");
         if (mActivity != null) {
             mActivity.startActivityForResult(createIntent(), mRequestCode);
@@ -148,16 +166,7 @@ class ImagePickHelper {
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == mRequestCode) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startSelect();
-            } else {
-                if (mCallback != null) {
-                    mCallback.onError(permissionDenied);
-                }
-            }
-
-        }
+        mPermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 }

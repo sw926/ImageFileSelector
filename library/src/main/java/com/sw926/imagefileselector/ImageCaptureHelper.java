@@ -1,6 +1,7 @@
 package com.sw926.imagefileselector;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -29,8 +31,19 @@ public class ImageCaptureHelper {
     @Nullable
     private ImageFileSelector.Callback mCallback;
 
-//    @Nullable
-//    private Uri mCameraTempUri;
+    private final PermissionsHelper mPermissionsHelper = new PermissionsHelper();
+    private final PermissionsHelper.Callback mPermissionCallback = new PermissionsHelper.Callback() {
+        @Override
+        public void onRequestPermissionsCallback(boolean isGranted) {
+            if (isGranted) {
+                capture();
+            } else {
+                if (mCallback != null) {
+                    mCallback.onError(permissionDenied);
+                }
+            }
+        }
+    };
 
     @Nullable
     private File mOutputFile;
@@ -99,9 +112,11 @@ public class ImageCaptureHelper {
     }
 
     public void onRequestPermissionsResult(Context context, int requestCode, String[] permissions, int[] grantResults) {
+        mPermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == mRequestCode) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                capture(context);
+                capture();
             } else {
                 if (mCallback != null) {
                     mCallback.onError(permissionDenied);
@@ -146,10 +161,13 @@ public class ImageCaptureHelper {
         this.mActivity = activity;
         this.mFragment = null;
 
-        if (mActivity != null)
-            if (PermissionsHelper.checkAndRequestPermission(mActivity, mRequestCode)) {
-                capture(mActivity);
+        if (mActivity != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                mPermissionsHelper.checkAndRequestPermission(mActivity, requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
+            } else {
+                capture();
             }
+        }
     }
 
     public void captureImage(Fragment fragment, int requestCode) {
@@ -158,13 +176,15 @@ public class ImageCaptureHelper {
         this.mFragment = fragment;
 
         if (mFragment != null) {
-            if (PermissionsHelper.checkAndRequestPermission(mFragment, mRequestCode)) {
-                capture(mFragment.getContext());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                mPermissionsHelper.checkAndRequestPermission(mFragment, requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
+            } else {
+                capture();
             }
         }
     }
 
-    private void capture(Context context) {
+    private void capture() {
         if (!CommonUtils.hasSDCardMounted()) {
             if (mCallback != null) {
                 mCallback.onError(ErrorResult.error);
@@ -174,6 +194,14 @@ public class ImageCaptureHelper {
 
         try {
             AppLogger.i(TAG, "start capture image");
+
+            Context context = null;
+            if (mActivity != null) {
+                context = mActivity;
+            } else if (mFragment != null) {
+                context = mFragment.getContext();
+            }
+
             if (context != null) {
                 ContentValues values = new ContentValues(1);
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
