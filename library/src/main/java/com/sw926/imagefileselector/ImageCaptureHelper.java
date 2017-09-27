@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -145,11 +146,12 @@ public class ImageCaptureHelper {
         return null;
     }
 
-    private Intent createIntent() {
+    private Intent createIntent(@NonNull Context context) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         if (mOutputFile != null) {
-            Uri cameraTempUri = FileProvider.getUriForFile(mActivity, mActivity.getApplicationContext().getPackageName() + ".com.sw926.imagefileselector.provider", mOutputFile);
+
+            Uri cameraTempUri = FileProvider.getUriForFile(context, context.getPackageName() + ".com.sw926.imagefileselector.provider", mOutputFile);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri);
             intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
         }
@@ -212,12 +214,12 @@ public class ImageCaptureHelper {
             }
 
             if (mActivity != null) {
-                mActivity.startActivityForResult(createIntent(), mRequestCode);
+                mActivity.startActivityForResult(createIntent(mActivity), mRequestCode);
                 return;
             }
 
             if (mFragment != null) {
-                mFragment.startActivityForResult(createIntent(), mRequestCode);
+                mFragment.startActivityForResult(createIntent(mFragment.getContext()), mRequestCode);
             }
 
         } catch (Throwable e) {
