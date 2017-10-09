@@ -151,9 +151,13 @@ public class ImageCaptureHelper {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         if (mOutputFile != null) {
 
-            Uri cameraTempUri = FileProvider.getUriForFile(context, context.getPackageName() + ".com.sw926.imagefileselector.provider", mOutputFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri);
-            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Uri cameraTempUri = FileProvider.getUriForFile(context, context.getPackageName() + ".com.sw926.imagefileselector.provider", mOutputFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri);
+                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+            } else {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mOutputFile));
+            }
         }
         return intent;
     }
@@ -164,7 +168,7 @@ public class ImageCaptureHelper {
         this.mFragment = null;
 
         if (mActivity != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mPermissionsHelper.checkAndRequestPermission(mActivity, requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
             } else {
                 capture();
@@ -178,7 +182,7 @@ public class ImageCaptureHelper {
         this.mFragment = fragment;
 
         if (mFragment != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mPermissionsHelper.checkAndRequestPermission(mFragment, requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE);
             } else {
                 capture();
@@ -194,6 +198,7 @@ public class ImageCaptureHelper {
             return;
         }
 
+
         try {
             AppLogger.i(TAG, "start capture image");
 
@@ -205,11 +210,22 @@ public class ImageCaptureHelper {
             }
 
             if (context != null) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (cameraIntent.resolveActivity(context.getPackageManager()) == null) {
+                    if (mCallback != null) {
+                        mCallback.onError(error);
+                    }
+                    return;
+                }
+
                 ContentValues values = new ContentValues(1);
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
 
                 String fileName = "img_" + System.currentTimeMillis() + ".jpg";
                 mOutputFile = new File(context.getExternalCacheDir(), fileName);
+                if (!mOutputFile.getParentFile().exists()) {
+                    mOutputFile.getAbsoluteFile().mkdirs();
+                }
                 AppLogger.d(TAG, "capture ouput file: " + mOutputFile);
             }
 
