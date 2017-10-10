@@ -31,7 +31,7 @@ public class PermissionsHelper {
     @SuppressWarnings("WeakerAccess")
     public void checkAndRequestPermission(@NonNull Activity activity, int requestCode, @NonNull Callback callback, @NonNull String... permissions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (isHavePermissions(activity)) {
+            if (isHavePermissions(activity, permissions)) {
                 callback.onRequestPermissionsCallback(true);
                 setCurrentRequest(null, null, -1);
             } else {
@@ -47,7 +47,7 @@ public class PermissionsHelper {
     @SuppressWarnings("WeakerAccess")
     public void checkAndRequestPermission(@NonNull Fragment fragment, int requestCode, @NonNull Callback callback, @NonNull String... permissions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (isHavePermissions(fragment.getContext())) {
+            if (isHavePermissions(fragment.getContext(), permissions)) {
                 callback.onRequestPermissionsCallback(true);
                 setCurrentRequest(null, null, -1);
             } else {
