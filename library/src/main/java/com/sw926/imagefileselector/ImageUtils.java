@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +14,8 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    public static Bitmap compressImageFile(String srcFile, int maxWidth, int maxHeight) {
+    @Nullable
+    public static Bitmap compressImageFile(@NonNull String srcFile, int maxWidth, int maxHeight) {
         Bitmap bitmap = null;
 
         long inputFileLength = new File(srcFile).length();
@@ -103,7 +106,6 @@ public class ImageUtils {
 
         return bitmap;
     }
-
 
     public static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
         FileOutputStream fo;
