@@ -93,12 +93,24 @@ class ImagePickHelper {
     private void startSelect() {
         AppLogger.i(TAG, "start system gallery activity");
         if (mActivity != null) {
-            mActivity.startActivityForResult(createIntent(), mRequestCode);
+            try {
+                mActivity.startActivityForResult(createIntent(), mRequestCode);
+            } catch (Exception e) {
+                if (mCallback != null) {
+                    mCallback.onError(error);
+                }
+            }
             return;
         }
 
         if (mFragment != null) {
-            mFragment.startActivityForResult(createIntent(), mRequestCode);
+            try {
+                mFragment.startActivityForResult(createIntent(), mRequestCode);
+            } catch (Exception e) {
+                if (mCallback != null) {
+                    mCallback.onError(error);
+                }
+            }
             return;
         }
         AppLogger.e(TAG, "activity or fragment is null");
