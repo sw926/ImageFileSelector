@@ -13,7 +13,7 @@ import java.util.Stack;
 /**
  * Wrapper API for sending log output.
  */
-public class AppLogger {
+class AppLogger {
 
     static boolean DEBUG = true;
     protected static final String TAG = "ImageFileSelector";

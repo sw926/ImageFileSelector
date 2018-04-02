@@ -18,7 +18,7 @@ import java.io.File;
 import static com.sw926.imagefileselector.ErrorResult.error;
 import static com.sw926.imagefileselector.ErrorResult.permissionDenied;
 
-class ImagePickHelper {
+public class ImagePickHelper {
 
     private static final String TAG = "ImagePickHelper";
 
