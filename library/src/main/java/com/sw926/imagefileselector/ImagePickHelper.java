@@ -48,7 +48,7 @@ public class ImagePickHelper {
         }
     };
 
-    ImagePickHelper(Context context) {
+    public ImagePickHelper(Context context) {
         mContext = context;
     }
 
