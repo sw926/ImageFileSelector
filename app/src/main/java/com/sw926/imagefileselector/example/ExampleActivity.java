@@ -40,19 +40,20 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        ImageFileSelector.setDebug(true);
+        ImageFileSelector.Companion.setDebug(true);
 
         findViewById(R.id.btn_from_sdcard).setOnClickListener(this);
         findViewById(R.id.btn_from_camera).setOnClickListener(this);
         findViewById(R.id.btn_crop).setOnClickListener(this);
 
-        mImageView = (ImageView) findViewById(R.id.iv_image);
-        mTvPath = (TextView) findViewById(R.id.tv_path);
-        mEtWidth = (EditText) findViewById(R.id.et_width);
-        mEtHeight = (EditText) findViewById(R.id.et_height);
-        mBtnCrop = (Button) findViewById(R.id.btn_crop);
+        mImageView = findViewById(R.id.iv_image);
+        mTvPath = findViewById(R.id.tv_path);
+        mEtWidth = findViewById(R.id.et_width);
+        mEtHeight = findViewById(R.id.et_height);
+        mBtnCrop = findViewById(R.id.btn_crop);
 
         mImageFileSelector = new ImageFileSelector(this);
+        mImageFileSelector.setOutPutPath("/sdcard");
         mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
             @Override
             public void onError(ErrorResult errorResult) {
