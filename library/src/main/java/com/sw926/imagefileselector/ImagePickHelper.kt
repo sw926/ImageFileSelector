@@ -1,6 +1,7 @@
 package com.sw926.imagefileselector
 
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -49,7 +50,7 @@ class ImagePickHelper(private val mContext: Context) {
         this.mActivity = null
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mPermissionsHelper.checkAndRequestPermission(fragment, this.requestCode, mPermissionCallback/*, Manifest.permission.READ_EXTERNAL_STORAGE*/)
+            mPermissionsHelper.checkAndRequestPermission(fragment, this.requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
             startSelect()
         }
@@ -62,7 +63,7 @@ class ImagePickHelper(private val mContext: Context) {
         this.mFragment = null
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mPermissionsHelper.checkAndRequestPermission(activity, this.requestCode, mPermissionCallback/*, Manifest.permission.READ_EXTERNAL_STORAGE*/)
+            mPermissionsHelper.checkAndRequestPermission(activity, this.requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
             startSelect()
         }

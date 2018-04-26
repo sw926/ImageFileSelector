@@ -1,3 +1,5 @@
+@file:JvmName("ImageFileSelector")
+
 package com.sw926.imagefileselector
 
 import android.app.Activity
@@ -16,13 +18,15 @@ class ImageFileSelector(context: Context) {
     private val mImageCompressHelper: ImageCompressHelper
     private val permissionsHelper = PermissionsHelper()
 
-    var compressParams: ImageCompressHelper.CompressParams
-    private val mDefaultOutputPath: String
+    var compressParams: ImageCompressHelper.CompressParams = ImageCompressHelper.CompressParams()
+    private val mDefaultOutputPath: String? = try {
+        context.externalCacheDir.toString() + "/images/"
+    } catch (e: Throwable) {
+        null
+    }
 
     init {
-        mDefaultOutputPath = context.externalCacheDir.toString() + "/images/"
 
-        compressParams = ImageCompressHelper.CompressParams()
         compressParams.outputPath = mDefaultOutputPath
 
         mImageCompressHelper = ImageCompressHelper()
@@ -82,7 +86,7 @@ class ImageFileSelector(context: Context) {
         compressParams.compressFormat = compressFormat
     }
 
-    fun onActivityResult(context: Context, requestCode: Int, resultCode: Int, data: Intent) {
+    fun onActivityResult(context: Context, requestCode: Int, resultCode: Int, data: Intent?) {
         mImagePickHelper.onActivityResult(requestCode, resultCode, data)
         mImageCaptureHelper.onActivityResult(context, requestCode, resultCode, data)
     }
@@ -200,9 +204,7 @@ class ImageFileSelector(context: Context) {
 
             AppLogger.d(TAG, "get file: $file")
 
-            val jop = ImageCompressHelper.CompressJop()
-            jop.params = compressParams
-            jop.inputFile = file
+            val jop = ImageCompressHelper.CompressJop(compressParams, file)
             jop.deleteInputFile = mDeleteOutputFile
             mImageCompressHelper.compress(jop)
         }
