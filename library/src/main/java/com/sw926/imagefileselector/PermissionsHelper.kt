@@ -69,7 +69,7 @@ class PermissionsHelper {
         return unGrantPermissions.toTypedArray()
     }
 
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         var isAllGranted = true
         if (requestCode == mCurrentRequestCode) {
             for (grantResult in grantResults) {
