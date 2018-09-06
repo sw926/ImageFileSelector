@@ -207,6 +207,6 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mImageFileSelector.onRequestPermissionsResult(getContext(), requestCode, permissions, grantResults);
+        mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

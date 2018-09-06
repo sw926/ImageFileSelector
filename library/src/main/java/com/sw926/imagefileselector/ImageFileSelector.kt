@@ -91,11 +91,11 @@ class ImageFileSelector(context: Context) {
         mImageCaptureHelper.onActivityResult(context, requestCode, resultCode, data)
     }
 
-    fun onRequestPermissionsResult(context: Context, requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == mImagePickHelper.requestCode) {
             mImagePickHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
         } else if (requestCode == mImageCaptureHelper.requestCode) {
-            mImageCaptureHelper.onRequestPermissionsResult(context, requestCode, permissions, grantResults)
+            mImageCaptureHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
         } else {
             permissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }

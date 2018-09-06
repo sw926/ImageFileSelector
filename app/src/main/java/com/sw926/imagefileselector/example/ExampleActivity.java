@@ -159,7 +159,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mImageFileSelector.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+        mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void initImageFileSelector() {
