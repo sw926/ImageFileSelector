@@ -19,7 +19,7 @@ Maven
 Gradle
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.10'
+compile 'com.sw926.imagefileselector:library:1.0.16'
 ```
 
 
