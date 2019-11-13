@@ -81,8 +81,9 @@ public class Compatibility {
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
 
             // Return the remote address
-            if (isGooglePhotosUri(uri))
+            if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
+            }
 
             return getDataColumn(context, uri, null, null);
         }
@@ -120,9 +121,13 @@ public class Compatibility {
                 final int index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(index);
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
         } finally {
-            if (cursor != null)
+
+            if (cursor != null) {
                 cursor.close();
+            }
         }
         return null;
     }
