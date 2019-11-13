@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import java.io.File
 
 class ImageFileSelector(context: Context) {
@@ -179,8 +179,10 @@ class ImageFileSelector(context: Context) {
         compressParams.outputPath?.let {
             val outDir = File(it)
 
-            if (outDir.absolutePath.startsWith(context.externalCacheDir.absolutePath)) {
-                return false
+            context.externalCacheDir?.let { cacheDir ->
+                if (outDir.absolutePath.startsWith(cacheDir.absolutePath)) {
+                    return false
+                }
             }
 
             if (outDir.absolutePath.startsWith(context.filesDir.absolutePath)) {
@@ -204,7 +206,7 @@ class ImageFileSelector(context: Context) {
 
             AppLogger.d(TAG, "get file: $file")
 
-            val jop = ImageCompressHelper.CompressJop(compressParams, file)
+            val jop = ImageCompressHelper.CompressJop(file, compressParams)
             jop.deleteInputFile = mDeleteOutputFile
             mImageCompressHelper.compress(jop)
         }

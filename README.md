@@ -15,7 +15,7 @@ Maven
 <dependency>
     <groupId>com.sw926.imagefileselector</groupId>
     <artifactId>library</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.16</version>
 </dependency>
 ```
 Gradle

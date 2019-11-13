@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.text.TextUtils
 import com.sw926.imagefileselector.ErrorResult.error
 import com.sw926.imagefileselector.ErrorResult.permissionDenied

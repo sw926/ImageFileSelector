@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -162,7 +162,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
                 builder.append("path: ");
                 builder.append(file);
                 builder.append("\n\n");
-                builder.append("length: ");
+                builder.append("size: ");
                 builder.append((int) (imageFile.length() / 1024d));
                 builder.append("KB");
                 builder.append("\n\n");

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -114,7 +114,7 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
                 builder.append("path: ");
                 builder.append(file);
                 builder.append("\n\n");
-                builder.append("length: ");
+                builder.append("size: ");
                 builder.append((int) (imageFile.length() / 1024d));
                 builder.append("KB");
                 builder.append("\n\n");
