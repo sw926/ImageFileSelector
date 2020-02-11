@@ -7,13 +7,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.text.TextUtils
+import androidx.fragment.app.Fragment
 import com.sw926.imagefileselector.ErrorResult.error
 import com.sw926.imagefileselector.ErrorResult.permissionDenied
 import java.io.File
 
 class ImagePickHelper(private val mContext: Context) {
+
+    companion object {
+        private const val TAG = "ImagePickHelper"
+    }
 
     private var mCallback: ImageFileSelector.Callback? = null
     private var mFragment: Fragment? = null
@@ -29,9 +33,7 @@ class ImagePickHelper(private val mContext: Context) {
         if (isGranted) {
             startSelect()
         } else {
-            if (mCallback != null) {
-                mCallback!!.onError(permissionDenied)
-            }
+            mCallback?.onError(permissionDenied)
         }
     }
 
@@ -72,29 +74,41 @@ class ImagePickHelper(private val mContext: Context) {
     private fun startSelect() {
         AppLogger.i(TAG, "start system gallery activity")
         if (mActivity != null) {
-            mActivity!!.startActivityForResult(createIntent(), requestCode)
+            try {
+                mActivity?.startActivityForResult(createIntent(), requestCode)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             return
         }
 
         if (mFragment != null) {
-            mFragment!!.startActivityForResult(createIntent(), requestCode)
+            try {
+                mFragment?.startActivityForResult(createIntent(), requestCode)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             return
         }
         AppLogger.e(TAG, "activity or fragment is null")
-        if (mCallback != null) {
-            mCallback!!.onError(error)
-        }
+        mCallback?.onError(error)
     }
 
     private fun createIntent(): Intent {
-        val intent: Intent
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Intent(Intent.ACTION_OPEN_DOCUMENT)
         } else {
-            intent = Intent(Intent.ACTION_GET_CONTENT)
+            Intent(Intent.ACTION_GET_CONTENT)
         }
         intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = mType
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P
+                && Build.BOARD == "Xiaomi"
+                && Build.MODEL == "MIX 2") {
+            intent.type = "*/*"
+
+        } else {
+            intent.type = mType
+        }
         return intent
     }
 
@@ -115,28 +129,20 @@ class ImagePickHelper(private val mContext: Context) {
         if (requestCode == this.requestCode) {
             if (resultCode == Activity.RESULT_CANCELED) {
                 AppLogger.i(TAG, "canceled select image")
-                if (mCallback != null) {
-                    mCallback!!.onError(ErrorResult.canceled)
-                }
+                mCallback?.onError(ErrorResult.canceled)
             } else if (resultCode == Activity.RESULT_OK) {
                 if (intent == null) {
                     AppLogger.e(TAG, "select image error, intent null")
-                    if (mCallback != null) {
-                        mCallback!!.onError(error)
-                    }
+                    mCallback?.onError(error)
                 } else {
                     val uri = intent.data
                     val path = Compatibility.getPath(mContext, uri)
-                    if (!TextUtils.isEmpty(path) && File(path!!).exists()) {
+                    if (!TextUtils.isEmpty(path) && File(path).exists()) {
                         AppLogger.i(TAG, "select image success: $path")
-                        if (mCallback != null) {
-                            mCallback!!.onSuccess(path)
-                        }
+                        mCallback?.onSuccess(path)
                     } else {
                         AppLogger.e(TAG, "select image file path $path is error or not exists")
-                        if (mCallback != null) {
-                            mCallback!!.onError(error)
-                        }
+                        mCallback?.onError(error)
                     }
                 }
 
@@ -148,9 +154,5 @@ class ImagePickHelper(private val mContext: Context) {
         mPermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    companion object {
-
-        private val TAG = "ImagePickHelper"
-    }
 
 }

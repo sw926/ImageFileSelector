@@ -5,7 +5,9 @@
 
 [![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
 
-##### support Android 4.0+
+##### support Android Api Level >= 14
+
+Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
 How to use
 ----------
@@ -97,7 +99,7 @@ Crop Image
 ----------
 Init
 ```java
-ImageCropper mImageCropper = new ImageCropper(this);
+ImageCropper mImageCropper = new ImageCropper();
 mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
         @Override
         public void onError(@NotNull ImageCropper.CropperErrorResult result) {
@@ -149,3 +151,4 @@ crop image
 ```java
 mImageCropper.cropImage(file);
 ```
+[snap]: https://oss.sonatype.org/content/repositories/snapshots/com/squareup/moshi/

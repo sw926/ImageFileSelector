@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
 
-##### 支持Android版本：Android 4.0+
+##### 支持Android版本 Api Level >= 14
 
 使用方法
 ----------
@@ -96,7 +96,7 @@ mImageFileSelector.setOutPutPath();
 ----------
 初始化
 ```java
-ImageCropper mImageCropper = new ImageCropper(this);
+ImageCropper mImageCropper = new ImageCropper();
 mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
         @Override
         public void onError(@NotNull ImageCropper.CropperErrorResult result) {
