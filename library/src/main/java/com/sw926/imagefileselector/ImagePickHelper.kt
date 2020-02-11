@@ -29,7 +29,7 @@ class ImagePickHelper(private val mContext: Context) {
 
     private val mPermissionsHelper = PermissionsHelper()
 
-    private val mPermissionCallback = { isGranted: Boolean ->
+    private val mPermissionCallback: (Boolean) -> Unit = { isGranted: Boolean ->
         if (isGranted) {
             startSelect()
         } else {
