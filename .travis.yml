@@ -21,6 +21,7 @@ android:
     - 'google-gdk-license-.+'
 
 before_script:
+    - yes | sdkmanager --licenses
     - chmod +x gradlew
 
 script: "./gradlew build"
