@@ -2,80 +2,59 @@ package com.sw926.imagefileselector
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.os.AsyncTask
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import java.io.File
-import java.util.concurrent.Executors
 
-
-class ImageCompressHelper {
-
-    private var mCallback: Callback? = null
+object ImageCompressHelper {
+    const val TAG = "ImageCompressHelper"
 
     @SuppressLint("ParcelCreator")
     data class CompressParams(
-            var outputPath: String? = null,
-            var maxWidth: Int = 1000,
-            var maxHeight: Int = 1000,
-            var saveQuality: Int = 80,
-            var compressFormat: Bitmap.CompressFormat? = null
+            val outputPath: String? = null,
+            val maxWidth: Int = 1000,
+            val maxHeight: Int = 1000,
+            val saveQuality: Int = 80,
+            val compressFormat: Bitmap.CompressFormat? = null
     )
 
     @SuppressLint("ParcelCreator")
     class CompressJop(
-            var inputFile: String,
-            var params: CompressParams = CompressParams(),
-            var deleteInputFile: Boolean = false
+            val inputFile: String,
+            val params: CompressParams = CompressParams(),
+            val deleteInputFile: Boolean = false
     )
 
-    fun setCallback(callback: Callback) {
-        mCallback = callback
-    }
 
-    fun compress(jop: CompressJop) {
-        CompressTask().executeOnExecutor(Executors.newCachedThreadPool(), jop)
-    }
+    fun compress(jop: CompressJop, callback: (String?) -> Unit) {
+        val param = jop.params
+        val outputPath = param.outputPath
+        if (outputPath == null) {
+            clearJop(jop)
+            callback(null)
+            return
+        }
 
-    private inner class CompressTask : AsyncTask<CompressJop, Int, String>() {
-
-        override fun doInBackground(vararg jops: CompressJop): String? {
-            AppLogger.i(TAG, "------------------ start compress file ------------------")
-            val jop = jops[0]
-            val param = jop.params
-
-            val format = if (param.compressFormat == null) CompressFormatUtils.parseFormat(jop.inputFile) else param.compressFormat
-            AppLogger.i(TAG, "use compress format:" + format?.name)
-
-            val outputPath = param.outputPath
-            if (outputPath == null) {
-                clearJop(jop)
-                return null
-            }
-
+        val format = param.compressFormat ?: CompressFormatUtils.parseFormat(jop.inputFile)
+        doAsync {
             val parentDir = File(outputPath)
             if (!parentDir.exists()) {
                 parentDir.mkdirs()
             }
-
             val outputFile = File(parentDir, "img_" + System.currentTimeMillis() + CompressFormatUtils.getExt(format))
             val bitmap = ImageUtils.compressImageFile(jop.inputFile, param.maxWidth, param.maxHeight)
             if (bitmap != null) {
                 ImageUtils.saveBitmap(bitmap, outputFile.path, format, param.saveQuality)
-                if (outputFile.exists()) {
-                    AppLogger.i(TAG, "compress success, output file: " + outputFile.path)
-                    clearJop(jop)
-                    return outputFile.path
-                }
             }
-            clearJop(jop)
-            return null
-        }
-
-        override fun onPostExecute(result: String?) {
-            super.onPostExecute(result)
-            if (result != null) {
-                mCallback?.onSuccess(result)
+            if (outputFile.exists()) {
+                clearJop(jop)
+                uiThread {
+                    callback.invoke(outputFile.path)
+                }
             } else {
-                mCallback?.onError()
+                uiThread {
+                    callback.invoke(null)
+                }
             }
         }
     }
@@ -93,18 +72,6 @@ class ImageCompressHelper {
                 file.delete()
             }
         }
-    }
-
-
-    interface Callback {
-        fun onError()
-
-        fun onSuccess(file: String)
-    }
-
-    companion object {
-
-        const val TAG = "ImageCompressHelper"
     }
 
 }

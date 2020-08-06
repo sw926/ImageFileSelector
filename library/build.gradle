@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 16
+        targetSdkVersion 30
         versionCode 13
         versionName "1.0.10"
     }
@@ -28,8 +28,10 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.13'
-    compileOnly 'androidx.fragment:fragment:1.2.1'
+    compileOnly 'androidx.fragment:fragment:1.2.5'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.exifinterface:exifinterface:1.2.0"
+    implementation 'org.jetbrains.anko:anko-commons:0.10.8'
 }
 //https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle
 apply from: '../gradle-mvn-push.gradle'

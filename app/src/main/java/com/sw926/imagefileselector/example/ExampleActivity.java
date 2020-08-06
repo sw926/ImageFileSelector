@@ -53,7 +53,6 @@ public class ExampleActivity extends AppCompatActivity implements View.OnClickLi
         mBtnCrop = findViewById(R.id.btn_crop);
 
         mImageFileSelector = new ImageFileSelector(this);
-        mImageFileSelector.setOutPutPath("/sdcard");
         mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
             @Override
             public void onError(ErrorResult errorResult) {

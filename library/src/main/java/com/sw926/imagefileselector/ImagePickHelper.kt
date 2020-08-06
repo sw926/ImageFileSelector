@@ -7,35 +7,26 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.sw926.imagefileselector.ErrorResult.error
 import com.sw926.imagefileselector.ErrorResult.permissionDenied
-import java.io.File
+import java.lang.ref.WeakReference
 
-class ImagePickHelper(private val mContext: Context) {
+class ImagePickHelper {
 
     companion object {
         private const val TAG = "ImagePickHelper"
     }
 
+    private var callerWeakReference: WeakReference<Any>? = null
+
     private var mCallback: ImageFileSelector.Callback? = null
-    private var mFragment: Fragment? = null
-    private var mActivity: Activity? = null
+
     var requestCode = -1
         private set
 
     private var mType = "image/*"
-
-    private val mPermissionsHelper = PermissionsHelper()
-
-    private val mPermissionCallback: (Boolean) -> Unit = { isGranted: Boolean ->
-        if (isGranted) {
-            startSelect()
-        } else {
-            mCallback?.onError(permissionDenied)
-        }
-    }
 
     fun setType(type: String) {
         mType = type
@@ -48,50 +39,59 @@ class ImagePickHelper(private val mContext: Context) {
     fun selectImage(fragment: Fragment, requestCode: Int) {
         AppLogger.i(TAG, "start select image from fragment")
         this.requestCode = requestCode
-        this.mFragment = fragment
-        this.mActivity = null
+        callerWeakReference = WeakReference(fragment)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mPermissionsHelper.checkAndRequestPermission(fragment, this.requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
+        val context = fragment.context
+        if (context == null) {
+            mCallback?.onError(error)
+            return
+        }
+
+        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (PermissionsHelper.isGrant(context, *permissions)) {
             startSelect()
+        } else {
+            fragment.requestPermissions(permissions, requestCode)
         }
     }
 
     fun selectorImage(activity: Activity, requestCode: Int) {
         AppLogger.i(TAG, "start select image from activity")
         this.requestCode = requestCode
-        this.mActivity = activity
-        this.mFragment = null
+        callerWeakReference = WeakReference(activity)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            mPermissionsHelper.checkAndRequestPermission(activity, this.requestCode, mPermissionCallback, Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
+        val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (PermissionsHelper.isGrant(activity, *permissions)) {
             startSelect()
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                activity.requestPermissions(permissions, requestCode)
+            }
         }
     }
 
     private fun startSelect() {
         AppLogger.i(TAG, "start system gallery activity")
-        if (mActivity != null) {
-            try {
-                mActivity?.startActivityForResult(createIntent(), requestCode)
-            } catch (e: Exception) {
-                e.printStackTrace()
+        when (val caller = callerWeakReference?.get()) {
+            is Fragment -> {
+                try {
+                    caller.startActivityForResult(createIntent(), requestCode)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
-            return
-        }
-
-        if (mFragment != null) {
-            try {
-                mFragment?.startActivityForResult(createIntent(), requestCode)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            is Activity -> {
+                try {
+                    caller.startActivityForResult(createIntent(), requestCode)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
-            return
+            else -> {
+                AppLogger.e(TAG, "activity or fragment is null")
+                mCallback?.onError(error)
+            }
         }
-        AppLogger.e(TAG, "activity or fragment is null")
-        mCallback?.onError(error)
     }
 
     private fun createIntent(): Intent {
@@ -125,34 +125,49 @@ class ImagePickHelper(private val mContext: Context) {
         }
     }
 
+    private fun getContext(): Context? {
+        val caller = callerWeakReference?.get()
+        if (caller is Fragment) {
+            return caller.context
+        } else if (caller is Activity) {
+            return caller
+        }
+        return null
+    }
+
     fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         if (requestCode == this.requestCode) {
             if (resultCode == Activity.RESULT_CANCELED) {
                 AppLogger.i(TAG, "canceled select image")
                 mCallback?.onError(ErrorResult.canceled)
             } else if (resultCode == Activity.RESULT_OK) {
+                val context = getContext()
+                if (context == null) {
+                    mCallback?.onError(error)
+                    return
+                }
                 if (intent == null) {
                     AppLogger.e(TAG, "select image error, intent null")
                     mCallback?.onError(error)
-                } else {
-                    val uri = intent.data
-                    val path = Compatibility.getPath(mContext, uri)
-                    if (!TextUtils.isEmpty(path) && File(path).exists()) {
-                        AppLogger.i(TAG, "select image success: $path")
+                    return
+                }
+                intent.data?.let { Compatibility.getPath(context, it) }?.let { path ->
+                    if (path.isNotBlank()) {
                         mCallback?.onSuccess(path)
-                    } else {
-                        AppLogger.e(TAG, "select image file path $path is error or not exists")
-                        mCallback?.onError(error)
+                        return
                     }
                 }
-
+                mCallback?.onError(error)
             }
         }
     }
 
     fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        mPermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (PermissionsHelper.isAllGrant(grantResults)) {
+            startSelect()
+        } else {
+            mCallback?.onError(permissionDenied)
+        }
     }
-
 
 }
