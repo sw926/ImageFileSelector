@@ -149,4 +149,4 @@ crop image
 ```java
 mImageCropper.cropImage(file);
 ```
-[snap]: https://oss.sonatype.org/content/repositories/snapshots/com/squareup/moshi/
+[snap]: https://oss.sonatype.org/content/repositories/snapshots/com/sw926/imagefileselector/library/
