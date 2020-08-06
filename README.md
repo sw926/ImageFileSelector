@@ -1,6 +1,9 @@
 [中文说明](README-zh.md)
 
 # ImageFileSelector
+
+[![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
+
 ##### Use the system software to select, compress, crop images
 
 ##### support Android Api Level >= 16

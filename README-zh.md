@@ -1,4 +1,7 @@
 # ImageFileSelector
+
+[![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
+
 ##### 轻量级的选取图片和裁切图片的库，使用系统自带的软件实现。
 
 ##### 支持Android版本 Api Level >= 16
