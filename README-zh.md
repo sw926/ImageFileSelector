@@ -1,9 +1,7 @@
 # ImageFileSelector
 ##### 轻量级的选取图片和裁切图片的库，使用系统自带的软件实现。
 
-[![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
-
-##### 支持Android版本 Api Level >= 14
+##### 支持Android版本 Api Level >= 16
 
 使用方法
 ----------
@@ -13,13 +11,13 @@ Maven
 <dependency>
     <groupId>com.sw926.imagefileselector</groupId>
     <artifactId>library</artifactId>
-    <version>1.0.16</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 Gradle
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.16'
+compile 'com.sw926.imagefileselector:library:1.1.0-SNAPSHOT'
 ```
 
 

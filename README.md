@@ -3,9 +3,7 @@
 # ImageFileSelector
 ##### Use the system software to select, compress, crop images
 
-[![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
-
-##### support Android Api Level >= 14
+##### support Android Api Level >= 16
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
 
@@ -17,13 +15,13 @@ Maven
 <dependency>
     <groupId>com.sw926.imagefileselector</groupId>
     <artifactId>library</artifactId>
-    <version>1.0.16</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 Gradle
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.0.16'
+compile 'com.sw926.imagefileselector:library:1.1.0-SNAPSHOT'
 ```
 
 
