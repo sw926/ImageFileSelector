@@ -239,6 +239,6 @@ class ImageCropper {
 
     interface ImageCropperCallback {
         fun onError(result: CropperErrorResult?)
-        fun onSuccess(outputFile: String?)
+        fun onSuccess(outputFile: String)
     }
 }

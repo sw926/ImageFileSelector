@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.sw926.imagefileselector.ErrorResult.*
 import java.io.File
@@ -125,16 +126,15 @@ class ImageCaptureHelper {
     }
 
     private fun createIntent(context: Context): Intent {
+        val file = File(context.getExternalFilesDir("app_share"), "capture.jpg")
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        mOutputFile?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val cameraTempUri = CommonUtils.getFileUri(context, it)
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri)
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
-            } else {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mOutputFile))
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val cameraTempUri = FileProvider.getUriForFile(context, "com.example.myapplication", file)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraTempUri)
+            intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
+        } else {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mOutputFile))
         }
         return intent
     }
