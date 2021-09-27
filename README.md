@@ -1,155 +1,50 @@
-[中文说明](README-zh.md)
-
 # ImageFileSelector
 
-[![Build Status](https://travis-ci.org/sw926/ImageFileSelector.svg?branch=master)](https://travis-ci.org/sw926/ImageFileSelector)
+轻量级的选取图片和裁切图片的库，使用系统自带的软件实现。
 
-##### Use the system software to select, compress, crop images
+支持Android版本 Api Level >= 16
 
-##### support Android Api Level >= 16
-
-Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
-
-How to use
-----------
-Maven
-
-```xml
-<dependency>
-    <groupId>com.sw926.imagefileselector</groupId>
-    <artifactId>library</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
-</dependency>
-```
-Gradle
+## 使用方法
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:1.1.0-SNAPSHOT'
+compile 'com.sw926.imagefileselector:library:2.0.0'
 ```
 
-
-Select Image
-----------
-Init
+在 Activity 或者 Fragment Start 之前进行初始化：
 
 ``` java
-ImageFileSelector mImageFileSelector = new ImageFileSelector(this);
-mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
+mImageFileSelector = new ImageFileSelector(this);
+mImageFileSelector.setOutPutImageSize(w, h);
+mImageFileSelector.setQuality(80);
+mImageFileSelector.setListener(new ImageFileResultListener() {
     @Override
-    public void onError(@NotNull ErrorResult errorResult) {
-        switch (errorResult) {
-            case permissionDenied:
-                break;
-            case canceled:
-                break;
-            case error:
-                break;
-        }
+    public void onSuccess(@NonNull String filePath) {
+        loadImage(filePath);
+        mCurrentSelectFile = new File(filePath);
+        mBtnCrop.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onSuccess(@NotNull String file) {
+    public void onCancel() {
+        Toast.makeText(ExampleActivity.this, "Canceled", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onError() {
+        Toast.makeText(ExampleActivity.this, "Unknown Error", Toast.LENGTH_LONG).show();
     }
 });
 ```
-Add code to you Activity or Fragment
-```java
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    mImageFileSelector.onActivityResult(this, requestCode, resultCode, data);
-}
 
-@Override
-protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    mImageFileSelector.onSaveInstanceState(outState);
-}
+在选择图片的地方调用：
 
-@Override
-protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-    mImageFileSelector.onRestoreInstanceState(savedInstanceState);
-}
-
-@Override
-public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    mImageFileSelector.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
-}
-```
-Setting parameters
-```java
-// Set the output file size
-mImageFileSelector.setOutPutImageSize(800, 600);
-Set the picture save quality, 0 to 100
-mImageFileSelector.setQuality(80)；
-```
-Start select image
-```java
-// take picture from camera
-mImageFileSelector.takePhoto(this, requestCode);
-// select image from sdcard
-mImageFileSelector.selectImage(this, requestCode);
-// Set the save path of the image，default: /sdcard/Android/data/{packagename}/cache/images/
-mImageFileSelector.setOutPutPath();
+``` java
+mImageFileSelector.takePhoto();
+// 或者
+mImageFileSelector.selectImage();
 ```
 
+## 说明
 
-Crop Image
-----------
-Init
-```java
-ImageCropper mImageCropper = new ImageCropper();
-mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
-        @Override
-        public void onError(@NotNull ImageCropper.CropperErrorResult result) {
-            switch (result) {
-                case error:
-                    break;
-                case canceled:
-                    break;
-                case notSupport:
-                    break;
-            }
-        }
-
-        @Override
-        public void onSuccess(@NotNull String outputFile) {
-        }
-    });
-```
-Add code to you Activity or Fragment
-```java
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    mImageCropper.onActivityResult(requestCode, resultCode, data);
-}
-
-@Override
-protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    mImageCropper.onSaveInstanceState(outState);
-}
-
-@Override
-protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-    mImageCropper.onRestoreInstanceState(savedInstanceState);
-}
-```
-Setting parameters
-```java
-// Sets the picture aspect ratio
-mImageCropper.setOutPutAspect(1, 1);
-// Sets the image size
-mImageCropper.setOutPut(800, 800);
-// Sets whether to scale
-mImageCropper.setScale(true);
-```
-crop image
-```java
-mImageCropper.cropImage(file);
-```
-[snap]: https://oss.sonatype.org/content/repositories/snapshots/com/sw926/imagefileselector/library/
+在 appcompat 支持 ActivityResultLauncher 后，选择图片已经非常简单，这个项目只是做了简单的封装，添加了拍照和图片压缩。选择图片不需要任何权限，如果 App 的 `AndroidManifest.xml` 没有添加 `<uses-permission android:name="android.permission.CAMERA" />`
+，拍照也不需要申请权限。

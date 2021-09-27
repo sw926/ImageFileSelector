@@ -1,10 +1,12 @@
 package com.sw926.imagefileselector.example;
 
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,10 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sw926.imagefileselector.ErrorResult;
-import com.sw926.imagefileselector.ImageCropper;
+import com.sw926.imagefileselector.ImageCropHelper;
+import com.sw926.imagefileselector.ImageFileResultListener;
 import com.sw926.imagefileselector.ImageFileSelector;
 
+import com.sw926.imagefileselector.ImageUriResultListener;
 import java.io.File;
 
 
@@ -35,7 +38,7 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
     private EditText mEtWidth;
     private EditText mEtHeight;
 
-    private ImageCropper mImageCropper;
+    private ImageCropHelper mImageCropHelper;
     private Button mBtnCrop;
 
     private File mCurrentSelectFile;
@@ -44,6 +47,12 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mImageFileSelector = new ImageFileSelector(this);
+        mImageCropHelper = new ImageCropHelper(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,52 +75,39 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         mEtHeight = (EditText) view.findViewById(R.id.et_height);
         mBtnCrop = (Button) view.findViewById(R.id.btn_crop);
 
-        mImageFileSelector = new ImageFileSelector(getContext());
-
-        mImageFileSelector.setCallback(new ImageFileSelector.Callback() {
+        mImageFileSelector.setListener(new ImageFileResultListener() {
             @Override
-            public void onError(ErrorResult errorResult) {
-                switch (errorResult) {
-                    case permissionDenied:
-                        Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_LONG).show();
-                        break;
-                    case canceled:
-                        Toast.makeText(getContext(), "Canceled", Toast.LENGTH_LONG).show();
-                        break;
-                    case error:
-                        Toast.makeText(getContext(), "Unknown Error", Toast.LENGTH_LONG).show();
-                        break;
-                }
+            public void onSuccess(@NonNull String filePath) {
+                loadImage(filePath);
+                mCurrentSelectFile = new File(filePath);
+                mBtnCrop.setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onSuccess(String file) {
-                loadImage(file);
-                mCurrentSelectFile = new File(file);
-                mBtnCrop.setVisibility(View.VISIBLE);
+            public void onCancel() {
+                Toast.makeText(getContext(), "Canceled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(getContext(), "Unknown Error", Toast.LENGTH_LONG).show();
             }
         });
 
-        mImageCropper = new ImageCropper();
-        mImageCropper.setCallback(new ImageCropper.ImageCropperCallback() {
+        mImageCropHelper.setListener(new ImageFileResultListener() {
             @Override
-            public void onError(ImageCropper.CropperErrorResult result) {
-                switch (result) {
-                    case error:
-                        Toast.makeText(getContext(), "crop image error", Toast.LENGTH_LONG).show();
-                        break;
-                    case canceled:
-                        Toast.makeText(getContext(), "crop image canceled", Toast.LENGTH_LONG).show();
-                        break;
-                    case notSupport:
-                        Toast.makeText(getContext(), "crop image not support", Toast.LENGTH_LONG).show();
-                        break;
-                }
+            public void onSuccess(@NonNull String filePath) {
+                loadImage(filePath);
             }
 
             @Override
-            public void onSuccess(String outputFile) {
-                loadImage(outputFile);
+            public void onCancel() {
+                Toast.makeText(getContext(), "crop image canceled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(getContext(), "crop image error", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -121,19 +117,19 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_from_camera: {
                 initImageFileSelector();
-                mImageFileSelector.takePhoto(this, 1);
+                mImageFileSelector.takePhoto();
                 break;
             }
             case R.id.btn_from_sdcard: {
                 initImageFileSelector();
-                mImageFileSelector.selectImage(this, 2);
+                mImageFileSelector.selectImage();
                 break;
             }
             case R.id.btn_crop: {
                 if (mCurrentSelectFile != null) {
-                    mImageCropper.setOutPut(800, 800);
-                    mImageCropper.setOutPutAspect(1, 1);
-                    mImageCropper.cropImage(this, mCurrentSelectFile.getPath(), 3);
+                    mImageCropHelper.setOutPut(800, 800);
+                    mImageCropHelper.setOutPutAspect(1, 1);
+                    mImageCropHelper.cropImage(mCurrentSelectFile.getPath());
                 }
                 break;
             }
@@ -153,60 +149,28 @@ public class ExampleFragment extends Fragment implements View.OnClickListener {
     }
 
     private void loadImage(final String file) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Bitmap bitmap = BitmapFactory.decodeFile(file);
-                File imageFile = new File(file);
-                final StringBuilder builder = new StringBuilder();
-                builder.append("path: ");
-                builder.append(file);
-                builder.append("\n\n");
-                builder.append("size: ");
-                builder.append((int) (imageFile.length() / 1024d));
-                builder.append("KB");
-                builder.append("\n\n");
-                builder.append("image size: (");
-                builder.append(bitmap.getWidth());
-                builder.append(", ");
-                builder.append(bitmap.getHeight());
-                builder.append(")");
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageView.setImageBitmap(bitmap);
-                        mTvPath.setText(builder.toString());
-                    }
+        new Thread(() -> {
+            final Bitmap bitmap = BitmapFactory.decodeFile(file);
+            File imageFile = new File(file);
+            final StringBuilder builder = new StringBuilder();
+            builder.append("path: ");
+            builder.append(file);
+            builder.append("\n\n");
+            builder.append("size: ");
+            builder.append((int) (imageFile.length() / 1024d));
+            builder.append("KB");
+            builder.append("\n\n");
+            builder.append("image size: (");
+            builder.append(bitmap.getWidth());
+            builder.append(", ");
+            builder.append(bitmap.getHeight());
+            builder.append(")");
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    mImageView.setImageBitmap(bitmap);
+                    mTvPath.setText(builder.toString());
                 });
             }
         }).start();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mImageFileSelector.onActivityResult(getContext(), requestCode, resultCode, data);
-        mImageCropper.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mImageFileSelector.onSaveInstanceState(outState);
-        mImageCropper.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        mImageFileSelector.onRestoreInstanceState(savedInstanceState);
-        mImageCropper.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @SuppressWarnings("NullableProblems")
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mImageFileSelector.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

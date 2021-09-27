@@ -1,8 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sw926.imagefileselector">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />

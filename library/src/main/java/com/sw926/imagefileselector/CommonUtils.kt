@@ -2,14 +2,23 @@ package com.sw926.imagefileselector
 
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import androidx.core.content.FileProvider
-import java.io.*
+import java.io.File
 
 object CommonUtils {
 
     fun getOutPutPath(context: Context): File {
-        return File(context.externalCacheDir, "/imagefileselector/")
+        val file = File(context.cacheDir, "/imagefileselector/")
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+        return file
+    }
+
+    fun getPathFromFileProviderUri(context: Context, uri: Uri): String? {
+        return uri.lastPathSegment?.let {
+            File(getOutPutPath(context), it).path
+        }
     }
 
     fun getFileUri(context: Context, file: File): Uri {
@@ -25,8 +34,4 @@ object CommonUtils {
         return File(getOutPutPath(context), fileName)
     }
 
-    fun hasSDCardMounted(): Boolean {
-        val state = Environment.getExternalStorageState()
-        return state != null && state == Environment.MEDIA_MOUNTED
-    }
 }

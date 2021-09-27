@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sw926.imagefileselector.example">
 
-    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="false"
@@ -14,7 +13,9 @@
             android:configChanges="keyboardHidden"
             android:label="From Activity"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".LaunchActivity">
+        <activity
+            android:name=".LaunchActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
