@@ -7,7 +7,7 @@
 ## 使用方法
 
 ```gradle
-compile 'com.sw926.imagefileselector:library:2.0.0'
+implementation 'com.sw926.imagefileselector:library:2.0.0'
 ```
 
 在 Activity 或者 Fragment Start 之前进行初始化：
