@@ -34,21 +34,56 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.3.1'
 }
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 afterEvaluate {
     publishing {
         publications {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
-                // Applies the component for the release build variant.
+                pom {
+                    name = POM_NAME
+                    description = POM_DESCRIPTION
+                    url = POM_URL
+                    licenses {
+                        license {
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
+                            email = EMAIL
+                        }
+                    }
+                    scm {
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                        url = POM_SCM_URL
+                    }
+                }
+
                 from components.release
 
-                // You can then customize attributes of the publication as shown below.
-                groupId = 'com.sw926.imagefileselector'
-                artifactId = 'library'
-                version = '2.0.0'
+                groupId = GROUP
+                artifactId = ARTIFACTID
+                version = VERSION_NAME
 
-                repositories {
-                    mavenCentral()
+                artifact(sourceJar)
+            }
+        }
+
+        repositories {
+            maven {
+                url = version.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY_URL : RELEASE_REPOSITORY_URL
+                credentials {
+                    username = NEXUS_USERNAME
+                    password = NEXUS_PASSWORD
                 }
             }
         }
