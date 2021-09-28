@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 31
@@ -88,4 +89,11 @@ afterEvaluate {
             }
         }
     }
+
+    signing {
+        sign publishing.publications.release
+    }
 }
+
+
+
